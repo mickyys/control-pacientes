@@ -5,6 +5,16 @@
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
         <MediaTemplate EmbedCab="yes" />
 
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="INSTALLFOLDER" Name="ControlPacientes" />
+        </StandardDirectory>
+
+        <StandardDirectory Id="ProgramMenuFolder">
+            <Directory Id="ApplicationProgramsFolder" Name="Control de Pacientes" />
+        </StandardDirectory>
+
+        <StandardDirectory Id="DesktopFolder" />
+
         <Feature Id="ProductFeature" Title="Control de Pacientes" Level="1">
             <ComponentRef Id="MainExecutable" />
             <ComponentRef Id="ApplicationShortcut" />
@@ -12,21 +22,9 @@
     </Product>
 
     <Fragment>
-        <Directory Id="TARGETDIR" Name="SourceDir">
-            <Directory Id="ProgramFilesFolder">
-                <Directory Id="INSTALLFOLDER" Name="ControlPacientes" />
-            </Directory>
-            <Directory Id="ProgramMenuFolder">
-                <Directory Id="ApplicationProgramsFolder" Name="Control de Pacientes" />
-            </Directory>
-            <Directory Id="DesktopFolder" Name="Desktop" />
-        </Directory>
-    </Fragment>
-
-    <Fragment>
         <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
             <Component Id="MainExecutable" Guid="*">
-                <File Id="ControlPacientes" Source="ControlPacientes.UI.exe" KeyPath="yes" Assemblyversion="1.0.0.0" />
+                <File Id="ControlPacientes" Source="publish/ControlPacientes.UI.exe" KeyPath="yes" />
             </Component>
         </ComponentGroup>
     </Fragment>
