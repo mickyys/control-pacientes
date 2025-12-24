@@ -1,0 +1,63 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      
+      - name: Install WiX Toolset
+        run: |
+          dotnet tool install --global WiX
+      
+      - name: Restore dependencies
+        run: dotnet restore
+      
+      - name: Build Release
+        run: dotnet build -c Release
+      
+      - name: Publish Application
+        run: dotnet publish ControlPacientes.UI/ControlPacientes.UI.csproj -c Release -r win-x64 --self-contained -o publish
+      
+      - name: Build Installer
+        run: |
+          dotnet publish ControlPacientes.UI/ControlPacientes.UI.csproj -c Release -o ControlPacientes.Installer\bin
+          wix build ControlPacientes.Installer/Product.wxs -out installer.msi
+      
+      - name: Get Version
+        id: version
+        run: |
+          $version = (Select-String -Path "Directory.Build.props" -Pattern '<Version>(.*?)</Version>' | ForEach-Object { $_.Matches.Groups[1].Value })
+          echo "app_version=$version" >> $env:GITHUB_OUTPUT
+      
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.app_version }}
+          release_name: Release v${{ steps.version.outputs.app_version }}
+          draft: false
+          prerelease: false
+      
+      - name: Upload Installer to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./installer.msi
+          asset_name: ControlPacientes-${{ steps.version.outputs.app_version }}.msi
+          asset_content_type: application/x-msi

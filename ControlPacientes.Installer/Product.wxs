@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="*" Name="Control de Pacientes" Language="1033" Version="1.0.0.0" Manufacturer="ControlPacientes" UpgradeCode="12345678-1234-1234-1234-111111111111">
+        <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+        <MediaTemplate EmbedCab="yes" />
+
+        <Feature Id="ProductFeature" Title="Control de Pacientes" Level="1">
+            <ComponentRef Id="MainExecutable" />
+            <ComponentRef Id="ApplicationShortcut" />
+        </Feature>
+    </Product>
+
+    <Fragment>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLFOLDER" Name="ControlPacientes" />
+            </Directory>
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="ApplicationProgramsFolder" Name="Control de Pacientes" />
+            </Directory>
+            <Directory Id="DesktopFolder" Name="Desktop" />
+        </Directory>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component Id="MainExecutable" Guid="*">
+                <File Id="ControlPacientes" Source="ControlPacientes.UI.exe" KeyPath="yes" Assemblyversion="1.0.0.0" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="Shortcuts" Directory="ApplicationProgramsFolder">
+            <Component Id="ApplicationShortcut" Guid="*">
+                <Shortcut Id="ApplicationStartMenuShortcut" Name="Control de Pacientes" Description="Gestionar pacientes y fichas médicas" Target="[#ControlPacientes]" WorkingDirectory="INSTALLFOLDER" />
+                <Shortcut Id="UninstallProduct" Name="Desinstalar Control de Pacientes" Target="[SystemFolder]msiexec.exe" Arguments="/x [ProductCode]" />
+                <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
+                <RegistryValue Root="HKCU" Key="Software\ControlPacientes" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
