@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    permissions:
+      contents: write
     
     steps:
       - uses: actions/checkout@v4
@@ -42,6 +44,7 @@ jobs:
           echo "app_version=$version" >> $env:GITHUB_OUTPUT
       
       - name: Create Release
+        id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
