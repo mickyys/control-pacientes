@@ -18,10 +18,6 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       
-      - name: Install WiX Toolset
-        run: |
-          dotnet tool install --global WiX
-      
       - name: Restore dependencies
         run: dotnet restore
       
@@ -31,10 +27,13 @@ jobs:
       - name: Publish Application
         run: dotnet publish ControlPacientes.UI/ControlPacientes.UI.csproj -c Release -r win-x64 --self-contained -o publish
       
+      - name: Install WiX Toolset
+        run: |
+          dotnet tool install --global wix
+      
       - name: Build Installer
         run: |
-          dotnet publish ControlPacientes.UI/ControlPacientes.UI.csproj -c Release -o ControlPacientes.Installer\bin
-          wix build ControlPacientes.Installer/Product.wxs -out installer.msi
+          wix build -o installer.msi ControlPacientes.Installer/Product.wxs
       
       - name: Get Version
         id: version

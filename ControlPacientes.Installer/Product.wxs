@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Product Id="*" Name="Control de Pacientes" Language="1033" Version="1.0.0.0" Manufacturer="ControlPacientes" UpgradeCode="12345678-1234-1234-1234-111111111111">
-        <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+        <Package Compressed="yes" InstallScope="perMachine" />
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
         <MediaTemplate EmbedCab="yes" />
 
