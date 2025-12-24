@@ -30,23 +30,29 @@ namespace ControlPacientes.UI
             // Servicios de negocio
             services.AddBusinessServices();
 
-            // Vistas
-            services.AddScoped<MainWindow>();
-            services.AddScoped<PacientesWindow>();
-            services.AddScoped<EditarPacienteWindow>();
-            services.AddScoped<FichasMedicasWindow>();
-            services.AddScoped<EditarFichaMedicaWindow>();
+            // Vistas: registrar como transientes para ventanas
+            services.AddTransient<MainWindow>();
+            services.AddTransient<PacientesWindow>();
+            services.AddTransient<EditarPacienteWindow>();
+            services.AddTransient<FichasMedicasWindow>();
+            services.AddTransient<EditarFichaMedicaWindow>();
         }
 
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            // Inicializar base de datos
-            var task = DataServiceCollectionExtensions.InitializeDatabaseAsync(_serviceProvider);
-            task.Wait();
+            try
+            {
+                await DataServiceCollectionExtensions.InitializeDatabaseAsync(_serviceProvider);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error inicializando base de datos: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown(-1);
+                return;
+            }
 
-            // Mostrar ventana principal
             var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
             mainWindow.Show();
         }

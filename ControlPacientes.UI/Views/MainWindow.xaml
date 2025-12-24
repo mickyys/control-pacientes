@@ -4,6 +4,7 @@
         Title="Control de Pacientes" Height="700" Width="1000"
         WindowStartupLocation="CenterScreen"
         Background="#F5F5F5">
+
     <Grid>
         <StackPanel Orientation="Vertical" Margin="20">
             <!-- Encabezado -->
@@ -52,9 +53,8 @@
                 
                 <!-- Reportes -->
                 <Border Grid.Column="2" Margin="10" Background="White" 
-                       Padding="20"
-                       Style="{StaticResource ButtonStackPanelStyle}">
-                    <StackPanel>
+                       Padding="20">
+                    <StackPanel Style="{StaticResource ButtonStackPanelStyle}">
                         <TextBlock Text="📊" FontSize="48" TextAlignment="Center" Margin="0,0,0,10"/>
                         <TextBlock Text="Reportes" FontSize="16" FontWeight="Bold" TextAlignment="Center"/>
                         <TextBlock Text="Ver estadísticas y reportes" FontSize="12" 
@@ -74,15 +74,4 @@
             </Border>
         </StackPanel>
     </Grid>
-    
-    <Window.Resources>
-        <Style x:Key="ButtonStackPanelStyle" TargetType="StackPanel">
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#E8F2F7"/>
-                </Trigger>
-            </Style.Triggers>
-            <Setter Property="Cursor" Value="Hand"/>
-        </Style>
-    </Window.Resources>
 </Window>

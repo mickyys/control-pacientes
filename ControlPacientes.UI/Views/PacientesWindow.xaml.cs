@@ -10,24 +10,38 @@ namespace ControlPacientes.UI.Views
 {
     public partial class PacientesWindow : Window
     {
+        // El servicio puede ser nulo en tiempo de diseño; por eso es nullable.
         private readonly IPacienteService? _pacienteService;
         private ObservableCollection<Paciente> _pacientes = new();
 
-        public PacientesWindow(IPacienteService? pacienteService = null)
+        // Constructor parameterless para el diseñador XAML / creación sin DI
+        public PacientesWindow()
         {
             InitializeComponent();
-            _pacienteService = pacienteService;
             PacientesGrid.ItemsSource = _pacientes;
+            // No llamar a operaciones que requieran el servicio cuando éste no existe
+        }
+
+        // Constructor para inyección de dependencias en tiempo de ejecución
+        public PacientesWindow(IPacienteService pacienteService)
+            : this()
+        {
+            _pacienteService = pacienteService ?? throw new ArgumentNullException(nameof(pacienteService));
+
+            // Cargas iniciales (seguras porque _pacienteService no es null aquí)
             CargarCiudades();
             CargarPacientes();
         }
 
         private async void CargarPacientes(string searchTerm = "", string ciudad = "")
         {
+            if (_pacienteService == null)
+                return; // Evitar NullReference durante diseño o si no se inyectó el servicio
+
             try
             {
                 IEnumerable<Paciente> pacientes;
-                
+
                 if (string.IsNullOrEmpty(searchTerm) && string.IsNullOrEmpty(ciudad))
                     pacientes = await _pacienteService.ObtenerTodosPacientesAsync();
                 else
@@ -45,6 +59,9 @@ namespace ControlPacientes.UI.Views
 
         private async void CargarCiudades()
         {
+            if (_pacienteService == null)
+                return; // Evitar NullReference durante diseño o si no se inyectó el servicio
+
             try
             {
                 var ciudades = await _pacienteService.ObtenerCiudadesAsync();
@@ -61,10 +78,10 @@ namespace ControlPacientes.UI.Views
         {
             var searchTerm = SearchBox.Text;
             var ciudad = CiudadCombo.SelectedItem?.ToString();
-            
+
             if (ciudad == "Todas las ciudades")
                 ciudad = "";
-            
+
             CargarPacientes(searchTerm, ciudad);
         }
 
@@ -72,10 +89,10 @@ namespace ControlPacientes.UI.Views
         {
             var searchTerm = SearchBox.Text;
             var ciudad = CiudadCombo.SelectedItem?.ToString();
-            
+
             if (ciudad == "Todas las ciudades")
                 ciudad = "";
-            
+
             CargarPacientes(searchTerm, ciudad);
         }
 
@@ -112,13 +129,16 @@ namespace ControlPacientes.UI.Views
         {
             if (PacientesGrid.SelectedItem is Paciente paciente)
             {
-                var resultado = MessageBox.Show($"¿Eliminar a {paciente.NombreCompleto}?", 
+                var resultado = MessageBox.Show($"¿Eliminar a {paciente.NombreCompleto}?",
                     "Confirmar eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-                
+
                 if (resultado == MessageBoxResult.Yes)
                 {
                     try
                     {
+                        if (_pacienteService == null)
+                            throw new InvalidOperationException("Servicio de pacientes no disponible");
+
                         await _pacienteService.EliminarPacienteAsync(paciente.Id);
                         CargarPacientes();
                         MessageBox.Show("Paciente eliminado correctamente");

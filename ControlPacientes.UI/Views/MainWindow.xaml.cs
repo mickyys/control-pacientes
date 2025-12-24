@@ -32,7 +32,7 @@ namespace ControlPacientes.UI.Views
 
         private void AbrirPacientes_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            var ventana = new PacientesWindow();
+            var ventana = new PacientesWindow(_pacienteService);
             ventana.Show();
         }
 
