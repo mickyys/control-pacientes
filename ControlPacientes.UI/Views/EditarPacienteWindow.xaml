@@ -53,7 +53,9 @@
                     </StackPanel>
                     <StackPanel Grid.Column="1">
                         <TextBlock Text="Ciudad *" FontWeight="Bold" Margin="0,0,0,5"/>
-                        <TextBox x:Name="CiudadBox" Padding="8" Background="#F9FAFB"/>
+                        <ComboBox x:Name="CiudadCombo" Padding="8" Background="#F9FAFB" 
+                                 IsEditable="True" IsTextSearchEnabled="True" 
+                                 DisplayMemberPath="Nombre" TextSearch.TextPath="Nombre"/>
                     </StackPanel>
                 </Grid>
 

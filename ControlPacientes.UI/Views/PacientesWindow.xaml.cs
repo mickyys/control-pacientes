@@ -12,6 +12,7 @@ namespace ControlPacientes.UI.Views
     {
         // El servicio puede ser nulo en tiempo de diseño; por eso es nullable.
         private readonly IPacienteService? _pacienteService;
+        private readonly ICiudadService? _ciudadService;
         private ObservableCollection<Paciente> _pacientes = new();
 
         // Constructor parameterless para el diseñador XAML / creación sin DI
@@ -23,12 +24,13 @@ namespace ControlPacientes.UI.Views
         }
 
         // Constructor para inyección de dependencias en tiempo de ejecución
-        public PacientesWindow(IPacienteService pacienteService)
+        public PacientesWindow(IPacienteService pacienteService, ICiudadService ciudadService)
             : this()
         {
             _pacienteService = pacienteService ?? throw new ArgumentNullException(nameof(pacienteService));
+            _ciudadService = ciudadService ?? throw new ArgumentNullException(nameof(ciudadService));
 
-            // Cargas iniciales (seguras porque _pacienteService no es null aquí)
+            // Cargas iniciales
             CargarCiudades();
             CargarPacientes();
         }
@@ -98,7 +100,9 @@ namespace ControlPacientes.UI.Views
 
         private void NuevoPaciente_Click(object sender, RoutedEventArgs e)
         {
-            var ventana = new EditarPacienteWindow();
+            if (_pacienteService == null || _ciudadService == null) return;
+            var ventana = new EditarPacienteWindow(_pacienteService, _ciudadService);
+            ventana.Owner = this;
             ventana.ShowDialog();
             CargarPacientes();
         }
@@ -107,7 +111,9 @@ namespace ControlPacientes.UI.Views
         {
             if (PacientesGrid.SelectedItem is Paciente paciente)
             {
-                var ventana = new EditarPacienteWindow(paciente);
+                if (_pacienteService == null || _ciudadService == null) return;
+                var ventana = new EditarPacienteWindow(_pacienteService, _ciudadService, paciente);
+                ventana.Owner = this;
                 ventana.ShowDialog();
                 CargarPacientes();
             }
@@ -117,7 +123,9 @@ namespace ControlPacientes.UI.Views
         {
             if (PacientesGrid.SelectedItem is Paciente paciente)
             {
-                var ventana = new EditarPacienteWindow(paciente);
+                if (_pacienteService == null || _ciudadService == null) return;
+                var ventana = new EditarPacienteWindow(_pacienteService, _ciudadService, paciente);
+                ventana.Owner = this;
                 ventana.ShowDialog();
                 CargarPacientes();
             }

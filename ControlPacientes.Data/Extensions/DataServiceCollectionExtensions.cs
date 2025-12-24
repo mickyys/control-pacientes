@@ -22,6 +22,7 @@ public static class DataServiceCollectionExtensions
         services.AddScoped<IPacienteRepository, PacienteRepository>();
         services.AddScoped<IFichaMedicaRepository, FichaMedicaRepository>();
         services.AddScoped<IMedicamentoAtencionRepository, MedicamentoAtencionRepository>();
+        services.AddScoped<ICiudadRepository, CiudadRepository>();
 
         return services;
     }
@@ -31,7 +32,7 @@ public static class DataServiceCollectionExtensions
         using (var scope = serviceProvider.CreateScope())
         {
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            await context.Database.MigrateAsync();
+            await context.Database.EnsureCreatedAsync();
         }
     }
 }

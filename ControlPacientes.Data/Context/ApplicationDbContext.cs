@@ -18,6 +18,8 @@ public class ApplicationDbContext : DbContext
     
     public DbSet<MedicamentoAtencion> MedicamentosAtencion { get; set; }
 
+    public DbSet<Ciudad> Ciudades { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -121,6 +123,18 @@ public class ApplicationDbContext : DbContext
             
             // Índice
             entity.HasIndex(e => e.FichaMedicaId);
+        });
+
+        // Configuración de Ciudad
+        modelBuilder.Entity<Ciudad>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.Property(e => e.Nombre)
+                .IsRequired()
+                .HasMaxLength(100);
+            
+            entity.HasIndex(e => e.Nombre).IsUnique();
         });
     }
 }

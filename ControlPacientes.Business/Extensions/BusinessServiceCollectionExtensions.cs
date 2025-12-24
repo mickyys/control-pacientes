@@ -16,6 +16,7 @@ public static class BusinessServiceCollectionExtensions
         services.AddScoped<IPacienteService, PacienteService>();
         services.AddScoped<IFichaMedicaService, FichaMedicaService>();
         services.AddScoped<IMedicamentoAtencionService, MedicamentoAtencionService>();
+        services.AddScoped<ICiudadService, CiudadService>();
 
         return services;
     }
