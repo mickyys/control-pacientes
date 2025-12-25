@@ -28,6 +28,8 @@ public class FichaMedicaFormController {
     @FXML
     private DatePicker fechaAtencionPicker;
     @FXML
+    private TextField profesionalField;
+    @FXML
     private TextArea motivoField;
     @FXML
     private TextArea diagnosticoField;
@@ -108,15 +110,17 @@ public class FichaMedicaFormController {
 
     public void setFicha(FichaMedica ficha) {
         this.currentFicha = ficha;
-        if (ficha.getId() != null) {
+        if (ficha != null && ficha.getId() != null) {
             titleText.setText("Editar Ficha Médica");
             fechaAtencionPicker.setValue(ficha.getFechaAtencion().toLocalDate());
+            profesionalField.setText(ficha.getProfesionalNombre());
             motivoField.setText(ficha.getMotivoConsulta());
             diagnosticoField.setText(ficha.getDiagnostico());
             observableMedicamentos.setAll(ficha.getMedicamentos());
         } else {
             titleText.setText("Nueva Ficha Médica");
             fechaAtencionPicker.setValue(java.time.LocalDate.now());
+            profesionalField.setText("Emilio Alcaino");
         }
     }
 
@@ -140,6 +144,7 @@ public class FichaMedicaFormController {
             } else {
                 currentFicha.setFechaAtencion(fechaAtencionPicker.getValue().atTime(java.time.LocalTime.now()));
             }
+            currentFicha.setProfesionalNombre(profesionalField.getText());
             currentFicha.setMotivoConsulta(motivoField.getText());
             currentFicha.setDiagnostico(diagnosticoField.getText());
 

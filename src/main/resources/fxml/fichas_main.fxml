@@ -15,9 +15,8 @@
     </padding>
 
     <HBox alignment="CENTER_LEFT" spacing="20.0">
-        <Text text="Todas las Fichas Médicas" styleClass="section-title"/>
+        <Text text="Fichas Médicas" styleClass="section-title"/>
         <Region HBox.hgrow="ALWAYS" />
-        <Button text="+ Nueva Ficha" styleClass="btn-primary" onAction="#handleNewFicha"/>
     </HBox>
 
     <TableView fx:id="fichasTable" VBox.vgrow="ALWAYS" styleClass="modern-table" style="-fx-margin-top: 20;">

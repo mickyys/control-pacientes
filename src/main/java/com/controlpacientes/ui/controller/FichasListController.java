@@ -56,13 +56,19 @@ public class FichasListController {
 
     private void addButtonToTable() {
         colAcciones.setCellFactory(param -> new TableCell<>() {
+            private final Button newBtn = new Button("Nueva Ficha");
             private final Button viewBtn = new Button("Ver/Editar");
             private final Button deleteBtn = new Button("Eliminar");
-            private final HBox container = new HBox(10, viewBtn, deleteBtn);
+            private final HBox container = new HBox(10, newBtn, viewBtn, deleteBtn);
 
             {
+                newBtn.getStyleClass().add("btn-sm-success");
                 viewBtn.getStyleClass().add("btn-sm-outline");
                 deleteBtn.getStyleClass().add("btn-sm-danger");
+                newBtn.setOnAction(event -> {
+                    FichaMedica f = getTableView().getItems().get(getIndex());
+                    handleNewFichaForPaciente(f.getPaciente());
+                });
                 viewBtn.setOnAction(event -> {
                     FichaMedica f = getTableView().getItems().get(getIndex());
                     handleEditFicha(f);
@@ -92,6 +98,15 @@ public class FichasListController {
     private void handleNewFicha() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, "Para crear una nueva ficha, selecciona un paciente desde 'Gestionar Pacientes'.");
         alert.showAndWait();
+    }
+
+    private void handleNewFichaForPaciente(com.controlpacientes.model.Paciente paciente) {
+        uiNavigator.openModal("/fxml/ficha_form.fxml", "Nueva Ficha Médica",
+                (FichaMedicaFormController controller) -> {
+                    controller.setPaciente(paciente);
+                    controller.setFicha(null);
+                });
+        loadAllFichas();
     }
 
     private void handleEditFicha(FichaMedica ficha) {

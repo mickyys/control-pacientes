@@ -26,13 +26,18 @@
         </VBox>
 
         <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="1">
-            <Label text="Motivo de la Consulta"/>
-            <TextArea fx:id="motivoField" prefHeight="80" wrapText="true" styleClass="search-field"/>
+            <Label text="Profesional"/>
+            <TextField fx:id="profesionalField" maxWidth="Infinity" styleClass="search-field"/>
         </VBox>
 
         <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="2">
+            <Label text="Motivo de la Consulta"/>
+            <TextArea fx:id="motivoField" prefHeight="160" wrapText="true" styleClass="search-field"/>
+        </VBox>
+
+        <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="3">
             <Label text="Diagnóstico"/>
-            <TextArea fx:id="diagnosticoField" prefHeight="120" wrapText="true" styleClass="search-field"/>
+            <TextArea fx:id="diagnosticoField" prefHeight="240" wrapText="true" styleClass="search-field"/>
         </VBox>
     </GridPane>
 

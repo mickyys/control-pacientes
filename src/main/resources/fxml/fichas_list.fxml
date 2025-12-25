@@ -20,7 +20,6 @@
             <Text fx:id="pacienteNameText" text="Paciente: Cargando..." style="-fx-fill: #6c757d; -fx-font-size: 14px;"/>
         </VBox>
         <Region HBox.hgrow="ALWAYS" />
-        <Button text="+ Nueva Ficha" styleClass="btn-primary" onAction="#handleNewFicha"/>
     </HBox>
 
     <TableView fx:id="fichasTable" VBox.vgrow="ALWAYS" styleClass="modern-table" style="-fx-margin-top: 20;">
@@ -28,8 +27,8 @@
             <TableColumn fx:id="colFecha" text="Fecha" prefWidth="150.0"/>
             <TableColumn fx:id="colPaciente" text="Paciente" prefWidth="200.0"/>
             <TableColumn fx:id="colProfesional" text="Profesional" prefWidth="200.0"/>
-            <TableColumn fx:id="colDiagnostico" text="Diagnóstico" prefWidth="300.0"/>
-            <TableColumn fx:id="colAcciones" text="Acciones" prefWidth="150.0"/>
+            <TableColumn fx:id="colDiagnostico" text="Diagnóstico" prefWidth="250.0"/>
+            <TableColumn fx:id="colAcciones" text="Acciones" prefWidth="300.0"/>
         </columns>
     </TableView>
 
