@@ -17,8 +17,7 @@
 
     <GridPane hgap="15" vgap="10">
         <columnConstraints>
-            <ColumnConstraints percentWidth="50"/>
-            <ColumnConstraints percentWidth="50"/>
+            <ColumnConstraints percentWidth="100"/>
         </columnConstraints>
 
         <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="0">
@@ -26,29 +25,14 @@
             <DatePicker fx:id="fechaAtencionPicker" maxWidth="Infinity" styleClass="search-field"/>
         </VBox>
 
-        <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="0">
-            <Label text="Profesional de Salud"/>
-            <TextField fx:id="profesionalField" styleClass="search-field"/>
-        </VBox>
-
-        <VBox spacing="5" GridPane.columnSpan="2" GridPane.rowIndex="1">
+        <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="1">
             <Label text="Motivo de la Consulta"/>
-            <TextField fx:id="motivoField" styleClass="search-field"/>
+            <TextArea fx:id="motivoField" prefHeight="80" wrapText="true" styleClass="search-field"/>
         </VBox>
 
         <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="2">
             <Label text="Diagnóstico"/>
-            <TextArea fx:id="diagnosticoField" prefHeight="100" wrapText="true" styleClass="search-field"/>
-        </VBox>
-
-        <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="2">
-            <Label text="Tratamiento"/>
-            <TextArea fx:id="tratamientoField" prefHeight="100" wrapText="true" styleClass="search-field"/>
-        </VBox>
-
-        <VBox spacing="5" GridPane.columnSpan="2" GridPane.rowIndex="3">
-            <Label text="Notas Adicionales"/>
-            <TextArea fx:id="notasField" prefHeight="80" wrapText="true" styleClass="search-field"/>
+            <TextArea fx:id="diagnosticoField" prefHeight="120" wrapText="true" styleClass="search-field"/>
         </VBox>
     </GridPane>
 

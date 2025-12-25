@@ -22,7 +22,7 @@ public class PacienteFormController {
     @FXML
     private TextField rutField;
     @FXML
-    private DatePicker fechaNacimientoPicker;
+    private Spinner<Integer> edadSpinner;
     @FXML
     private TextField nombreField;
     @FXML
@@ -41,12 +41,26 @@ public class PacienteFormController {
     private Paciente currentPaciente;
     private boolean saved = false;
 
+    @FXML
+    public void initialize() {
+        // Configurar spinner de edad: valores de 1 a 120
+        SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 120, 30);
+        edadSpinner.setValueFactory(valueFactory);
+        edadSpinner.setEditable(true);
+    }
+
     public void setPaciente(Paciente paciente) {
         this.currentPaciente = paciente;
         if (paciente.getId() != null) {
             titleText.setText("Editar Paciente");
             rutField.setText(paciente.getRut());
-            fechaNacimientoPicker.setValue(paciente.getFechaNacimiento());
+            
+            // Calcular edad desde la fecha de nacimiento
+            if (paciente.getFechaNacimiento() != null) {
+                int edad = calcularEdad(paciente.getFechaNacimiento());
+                edadSpinner.getValueFactory().setValue(edad);
+            }
+            
             nombreField.setText(paciente.getNombre());
             apellidoField.setText(paciente.getApellido());
             emailField.setText(paciente.getEmail());
@@ -70,7 +84,12 @@ public class PacienteFormController {
                 currentPaciente = new Paciente();
 
             currentPaciente.setRut(rutField.getText());
-            currentPaciente.setFechaNacimiento(fechaNacimientoPicker.getValue());
+            
+            // Calcular fecha de nacimiento desde la edad
+            int edad = edadSpinner.getValue();
+            LocalDate fechaNacimiento = LocalDate.now().minusYears(edad);
+            currentPaciente.setFechaNacimiento(fechaNacimiento);
+            
             currentPaciente.setNombre(nombreField.getText());
             currentPaciente.setApellido(apellidoField.getText());
             currentPaciente.setEmail(emailField.getText());
@@ -99,5 +118,22 @@ public class PacienteFormController {
     private void closeWindow() {
         Stage stage = (Stage) rutField.getScene().getWindow();
         stage.close();
+    }
+
+    /**
+     * Calcula la edad actual basada en una fecha de nacimiento
+     */
+    private int calcularEdad(LocalDate fechaNacimiento) {
+        LocalDate hoy = LocalDate.now();
+        int edad = hoy.getYear() - fechaNacimiento.getYear();
+        
+        // Ajustar si aún no ha cumplido años este año
+        if (hoy.getMonthValue() < fechaNacimiento.getMonthValue() ||
+            (hoy.getMonthValue() == fechaNacimiento.getMonthValue() && 
+             hoy.getDayOfMonth() < fechaNacimiento.getDayOfMonth())) {
+            edad--;
+        }
+        
+        return edad;
     }
 }

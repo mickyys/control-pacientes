@@ -15,7 +15,6 @@ import javafx.stage.Stage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Component
@@ -29,15 +28,9 @@ public class FichaMedicaFormController {
     @FXML
     private DatePicker fechaAtencionPicker;
     @FXML
-    private TextField profesionalField;
-    @FXML
-    private TextField motivoField;
+    private TextArea motivoField;
     @FXML
     private TextArea diagnosticoField;
-    @FXML
-    private TextArea tratamientoField;
-    @FXML
-    private TextArea notasField;
 
     @FXML
     private TableView<MedicamentoAtencion> medicamentosTable;
@@ -118,11 +111,8 @@ public class FichaMedicaFormController {
         if (ficha.getId() != null) {
             titleText.setText("Editar Ficha Médica");
             fechaAtencionPicker.setValue(ficha.getFechaAtencion().toLocalDate());
-            profesionalField.setText(ficha.getProfesionalNombre());
             motivoField.setText(ficha.getMotivoConsulta());
             diagnosticoField.setText(ficha.getDiagnostico());
-            tratamientoField.setText(ficha.getTratamiento());
-            notasField.setText(ficha.getNotas());
             observableMedicamentos.setAll(ficha.getMedicamentos());
         } else {
             titleText.setText("Nueva Ficha Médica");
@@ -144,12 +134,14 @@ public class FichaMedicaFormController {
                 currentFicha = new FichaMedica();
 
             currentFicha.setPaciente(currentPaciente);
-            currentFicha.setFechaAtencion(fechaAtencionPicker.getValue().atStartOfDay());
-            currentFicha.setProfesionalNombre(profesionalField.getText());
+            // Si es una nueva ficha, usar la hora actual. Si es edición, mantener la fecha original con hora actual
+            if (currentFicha.getId() == null) {
+                currentFicha.setFechaAtencion(java.time.LocalDateTime.now());
+            } else {
+                currentFicha.setFechaAtencion(fechaAtencionPicker.getValue().atTime(java.time.LocalTime.now()));
+            }
             currentFicha.setMotivoConsulta(motivoField.getText());
             currentFicha.setDiagnostico(diagnosticoField.getText());
-            currentFicha.setTratamiento(tratamientoField.getText());
-            currentFicha.setNotas(notasField.getText());
 
             currentFicha.setMedicamentos(new ArrayList<>(observableMedicamentos));
 

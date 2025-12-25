@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.controlpacientes.ui.controller.FichasListController"
+      spacing="0" styleClass="content-area" VBox.vgrow="ALWAYS">
+    
+    <padding>
+        <Insets top="30.0" left="40.0" right="40.0" bottom="30.0"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="20.0">
+        <Text text="Todas las Fichas Médicas" styleClass="section-title"/>
+        <Region HBox.hgrow="ALWAYS" />
+        <Button text="+ Nueva Ficha" styleClass="btn-primary" onAction="#handleNewFicha"/>
+    </HBox>
+
+    <TableView fx:id="fichasTable" VBox.vgrow="ALWAYS" styleClass="modern-table" style="-fx-margin-top: 20;">
+        <columns>
+            <TableColumn fx:id="colFecha" text="Fecha" prefWidth="150.0"/>
+            <TableColumn fx:id="colPaciente" text="Paciente" prefWidth="200.0"/>
+            <TableColumn fx:id="colProfesional" text="Profesional" prefWidth="200.0"/>
+            <TableColumn fx:id="colDiagnostico" text="Diagnóstico" prefWidth="300.0"/>
+            <TableColumn fx:id="colAcciones" text="Acciones" prefWidth="150.0"/>
+        </columns>
+    </TableView>
+</VBox>

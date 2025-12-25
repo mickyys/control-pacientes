@@ -27,8 +27,8 @@
         </VBox>
 
         <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="0">
-            <Label text="Fecha de Nacimiento"/>
-            <DatePicker fx:id="fechaNacimientoPicker" maxWidth="Infinity" styleClass="search-field"/>
+            <Label text="Edad"/>
+            <Spinner fx:id="edadSpinner" maxWidth="Infinity" styleClass="search-field"/>
         </VBox>
 
         <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="1">
