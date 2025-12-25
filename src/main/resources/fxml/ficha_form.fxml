@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.controlpacientes.ui.controller.FichaMedicaFormController"
+      spacing="15" styleClass="content-area" prefWidth="800" prefHeight="700">
+    <padding>
+        <Insets top="25" left="30" right="30" bottom="25"/>
+    </padding>
+
+    <Text fx:id="titleText" text="Nueva Ficha Médica" styleClass="section-title"/>
+
+    <GridPane hgap="15" vgap="10">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="50"/>
+            <ColumnConstraints percentWidth="50"/>
+        </columnConstraints>
+
+        <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <Label text="Fecha de Atención"/>
+            <DatePicker fx:id="fechaAtencionPicker" maxWidth="Infinity" styleClass="search-field"/>
+        </VBox>
+
+        <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <Label text="Profesional de Salud"/>
+            <TextField fx:id="profesionalField" styleClass="search-field"/>
+        </VBox>
+
+        <VBox spacing="5" GridPane.columnSpan="2" GridPane.rowIndex="1">
+            <Label text="Motivo de la Consulta"/>
+            <TextField fx:id="motivoField" styleClass="search-field"/>
+        </VBox>
+
+        <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="2">
+            <Label text="Diagnóstico"/>
+            <TextArea fx:id="diagnosticoField" prefHeight="100" wrapText="true" styleClass="search-field"/>
+        </VBox>
+
+        <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <Label text="Tratamiento"/>
+            <TextArea fx:id="tratamientoField" prefHeight="100" wrapText="true" styleClass="search-field"/>
+        </VBox>
+
+        <VBox spacing="5" GridPane.columnSpan="2" GridPane.rowIndex="3">
+            <Label text="Notas Adicionales"/>
+            <TextArea fx:id="notasField" prefHeight="80" wrapText="true" styleClass="search-field"/>
+        </VBox>
+    </GridPane>
+
+    <Separator />
+
+    <VBox spacing="10" VBox.vgrow="ALWAYS">
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Label text="Medicamentos" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button text="+ Agregar Medicamento" styleClass="btn-sm-outline" onAction="#handleAddMedicamento"/>
+        </HBox>
+
+        <TableView fx:id="medicamentosTable" VBox.vgrow="ALWAYS" editable="true" styleClass="modern-table">
+            <columns>
+                <TableColumn fx:id="colMedNombre" text="Nombre" prefWidth="150.0"/>
+                <TableColumn fx:id="colMedDosis" text="Dosis" prefWidth="100.0"/>
+                <TableColumn fx:id="colMedFrecuencia" text="Frecuencia" prefWidth="150.0"/>
+                <TableColumn fx:id="colMedDuracion" text="Duración" prefWidth="100.0"/>
+                <TableColumn fx:id="colMedIndicaciones" text="Indicaciones" prefWidth="150.0"/>
+                <TableColumn fx:id="colMedAcciones" text="" prefWidth="60.0"/>
+            </columns>
+        </TableView>
+    </VBox>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancelar" onAction="#handleCancel" styleClass="btn-secondary"/>
+        <Button text="Guardar Ficha" onAction="#handleSave" styleClass="btn-primary" fx:id="btnGuardar"/>
+    </HBox>
+</VBox>

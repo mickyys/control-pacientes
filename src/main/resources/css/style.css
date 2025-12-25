@@ -1,0 +1,81 @@
+.root {
+    -fx-font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.navbar {
+    -fx-background-color: linear-gradient(to right, #1e3c72, #2a5298);
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 5);
+}
+
+.navbar-title {
+    -fx-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.sidebar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 1 0 0;
+}
+
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #555555;
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 15;
+    -fx-background-radius: 5;
+}
+
+.sidebar-btn:hover {
+    -fx-background-color: #f0f4f8;
+    -fx-text-fill: #1e3c72;
+}
+
+.content-area {
+    -fx-background-color: #f8f9fa;
+}
+
+.section-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-fill: #333333;
+}
+
+.btn-primary {
+    -fx-background-color: #1e3c72;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 8 20;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #2a5298;
+}
+
+.search-field {
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #ced4da;
+    -fx-padding: 8;
+    -fx-font-size: 14px;
+}
+
+.modern-table {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #e0e0e0;
+}
+
+.modern-table .column-header {
+    -fx-background-color: #f1f3f5;
+    -fx-padding: 10;
+}
+
+.modern-table .table-row-cell:hover {
+    -fx-background-color: #e9ecef;
+}

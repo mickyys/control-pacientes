@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.controlpacientes.ui.controller.MainController"
+      prefHeight="700.0" prefWidth="1000.0"
+      spacing="0" styleClass="root-container">
+
+    <!-- Header / Navbar -->
+    <HBox styleClass="navbar" alignment="CENTER_LEFT" prefHeight="70.0">
+        <padding>
+            <Insets left="20.0" right="20.0"/>
+        </padding>
+        <Text text="Control de Pacientes" styleClass="navbar-title"/>
+    </HBox>
+
+    <!-- Main Content Area -->
+    <HBox VBox.vgrow="ALWAYS">
+        <!-- Sidebar -->
+        <VBox styleClass="sidebar" prefWidth="250.0" spacing="10.0">
+            <padding>
+                <Insets top="20.0" left="15.0" right="15.0"/>
+            </padding>
+            <Button text="Gestionar Pacientes" fx:id="btnPacientes" maxWidth="Infinity" styleClass="sidebar-btn" onAction="#handleShowPacientes"/>
+            <Button text="Fichas Médicas" fx:id="btnFichas" maxWidth="Infinity" styleClass="sidebar-btn" onAction="#handleShowFichas"/>
+        </VBox>
+
+        <!-- Dynamic Content -->
+        <VBox HBox.hgrow="ALWAYS" styleClass="content-area">
+            <padding>
+                <Insets top="30.0" left="40.0" right="40.0" bottom="30.0"/>
+            </padding>
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+                <Text text="Listado de Pacientes" styleClass="section-title"/>
+                <Region HBox.hgrow="ALWAYS" />
+                <Button text="+ Nuevo Paciente" styleClass="btn-primary" onAction="#handleNewPaciente"/>
+            </HBox>
+
+            <HBox spacing="10.0" style="-fx-padding: 20 0;">
+                <TextField fx:id="searchNombre" promptText="Buscar por nombre..." HBox.hgrow="ALWAYS" styleClass="search-field"/>
+                <TextField fx:id="searchRut" promptText="Buscar por RUT..." prefWidth="150" styleClass="search-field"/>
+                <TextField fx:id="searchEmail" promptText="Buscar por email..." prefWidth="150" styleClass="search-field"/>
+                <TextField fx:id="searchCiudad" promptText="Buscar por ciudad..." prefWidth="150" styleClass="search-field"/>
+                <Button text="Buscar" styleClass="btn-secondary" onAction="#handleSearch"/>
+                <Button text="Limpiar" styleClass="btn-secondary" onAction="#handleClearSearch"/>
+            </HBox>
+
+            <TableView fx:id="pacientesTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
+                <columns>
+                    <TableColumn fx:id="colRut" text="RUT" prefWidth="120.0"/>
+                    <TableColumn fx:id="colNombre" text="Nombre" prefWidth="250.0"/>
+                    <TableColumn fx:id="colEmail" text="Email" prefWidth="200.0"/>
+                    <TableColumn fx:id="colCiudad" text="Ciudad" prefWidth="150.0"/>
+                    <TableColumn fx:id="colAcciones" text="Acciones" prefWidth="150.0"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </HBox>
+</VBox>
