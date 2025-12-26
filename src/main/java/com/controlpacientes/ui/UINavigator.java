@@ -40,6 +40,8 @@ public class UINavigator {
                 return;
             }
 
+            // Establecer el ClassLoader explícitamente para evitar NullPointerException
+            loader.setClassLoader(getClass().getClassLoader());
             loader.setControllerFactory(applicationContext::getBean);
             Parent root = loader.load();
 
@@ -112,6 +114,8 @@ public class UINavigator {
                 return null;
             }
 
+            // Establecer el ClassLoader explícitamente para evitar NullPointerException
+            loader.setClassLoader(getClass().getClassLoader());
             loader.setControllerFactory(applicationContext::getBean);
             Parent root = loader.load();
 

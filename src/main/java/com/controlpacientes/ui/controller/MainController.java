@@ -46,6 +46,12 @@ public class MainController {
         loadFichasView();
     }
 
+    @FXML
+    private void handleExit() {
+        Stage stage = (Stage) dynamicContentContainer.getScene().getWindow();
+        stage.close();
+    }
+
     private void loadPacientesView() {
         Parent content = uiNavigator.loadView("/fxml/pacientes_list.fxml", (PacientesListController controller) -> {
             // El controlador se inicializa automáticamente

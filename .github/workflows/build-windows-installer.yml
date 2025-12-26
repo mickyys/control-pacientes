@@ -1,0 +1,166 @@
+name: Build Windows Installer
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK 19
+        uses: actions/setup-java@v3
+        with:
+          java-version: '19'
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: Build application with Maven
+        run: mvn clean package -DskipTests
+      
+      - name: Create application image
+        run: |
+          mkdir target\installer
+          mkdir target\image
+          
+          jpackage `
+            --input target `
+            --name "ControlPacientes" `
+            --main-jar control-pacientes-java-1.0.0.jar `
+            --main-class com.controlpacientes.ControlPacientesApplication `
+            --type app-image `
+            --icon src/main/resources/images/icono.png `
+            --dest target/image `
+            --description "Sistema de Control de Pacientes" `
+            --vendor "ControlPacientes" `
+            --app-version 1.0.0 `
+            --java-options "-Xmx2048m"
+        shell: powershell
+        continue-on-error: false
+      
+      - name: Download WiX Toolset
+        run: |
+          # Descargar WiX 3.14
+          $WixUrl = "https://github.com/wixtoolset/wix3/releases/download/wix314rtm/wix314.exe"
+          Invoke-WebRequest -Uri $WixUrl -OutFile wix314.exe
+          .\wix314.exe /install /quiet /norestart
+          
+          # Esperar a que se complete la instalación
+          Start-Sleep -Seconds 60
+        shell: powershell
+      
+      - name: Create MSI Installer with jpackage
+        run: |
+          $jarPath = Resolve-Path "target\control-pacientes-java-1.0.0.jar"
+          $outputDir = Resolve-Path "target"
+          $iconPath = Resolve-Path "src\main\resources\images\icono.png"
+          
+          jpackage `
+            --input target `
+            --name "ControlPacientes" `
+            --main-jar control-pacientes-java-1.0.0.jar `
+            --main-class com.controlpacientes.ControlPacientesApplication `
+            --type msi `
+            --icon $iconPath `
+            --dest $outputDir `
+            --install-dir "Program Files" `
+            --win-menu `
+            --win-menu-group "ControlPacientes" `
+            --win-dir-chooser `
+            --win-shortcut `
+            --win-shortcut-prompt `
+            --description "Sistema de Control de Pacientes" `
+            --vendor "ControlPacientes" `
+            --app-version "1.0.0" `
+            --license-file LICENSE
+        shell: powershell
+        continue-on-error: true
+      
+      - name: Create Alternative EXE with Launch4j (Fallback)
+        run: |
+          # Descargar Launch4j como alternativa
+          $Launch4jUrl = "https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-win32.zip/download"
+          Invoke-WebRequest -Uri $Launch4jUrl -OutFile launch4j.zip
+          Expand-Archive -Path launch4j.zip -DestinationPath tools
+          
+          # Crear configuración XML para Launch4j
+          $config = @"
+          <?xml version="1.0" encoding="UTF-8"?>
+          <launch4jConfig>
+            <dontWrapJar>false</dontWrapJar>
+            <headerType>gui</headerType>
+            <jar>target\control-pacientes-java-1.0.0.jar</jar>
+            <outfile>target\ControlPacientes.exe</outfile>
+            <errTitle></errTitle>
+            <cmdLine></cmdLine>
+            <chdir>.</chdir>
+            <priority>normal</priority>
+            <downloadUrl>http://java.com/download</downloadUrl>
+            <supportUrl></supportUrl>
+            <stayAlive>false</stayAlive>
+            <restartOnCrash>false</restartOnCrash>
+            <manifest></manifest>
+            <icon>src\main\resources\images\icono.png</icon>
+            <jre>
+              <path></path>
+              <bundledJre64Bit>false</bundledJre64Bit>
+              <bundledJreAsFallback>false</bundledJreAsFallback>
+              <minVersion>19</minVersion>
+              <maxVersion></maxVersion>
+              <jdkPreference>preferJre</jdkPreference>
+              <runtimeBits>64</runtimeBits>
+            </jre>
+            <versionInfo>
+              <fileVersion>1.0.0.0</fileVersion>
+              <productVersion>1.0.0.0</productVersion>
+              <companyName>ControlPacientes</companyName>
+              <fileDescription>Sistema de Control de Pacientes</fileDescription>
+              <internalName>ControlPacientes</internalName>
+              <legalCopyright></legalCopyright>
+              <originalFilename>ControlPacientes.exe</originalFilename>
+              <productName>ControlPacientes</productName>
+              <trademarks></trademarks>
+            </versionInfo>
+          </launch4jConfig>
+          "@
+          
+          Set-Content -Path "launch4j-config.xml" -Value $config
+          
+          # Ejecutar Launch4j
+          .\tools\launch4j\launch4jc.exe launch4j-config.xml
+        shell: powershell
+        continue-on-error: true
+      
+      - name: List generated files
+        run: Get-ChildItem -Recurse target -Include *.msi, *.exe | Select-Object FullName
+        shell: powershell
+      
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: control-pacientes-windows-installer
+          path: |
+            target/*.msi
+            target/*.exe
+          retention-days: 30
+      
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            target/*.msi
+            target/*.exe
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

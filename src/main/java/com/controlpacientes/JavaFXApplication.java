@@ -16,6 +16,12 @@ public class JavaFXApplication extends Application {
 
     @Override
     public void init() throws Exception {
+        // Configurar propiedades del sistema para macOS - necesario para evitar errores de headless mode
+        // al usar funciones de impresión en JavaFX
+        System.setProperty("apple.awt.application.name", "Control Pacientes");
+        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Control Pacientes");
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
+        
         springContext = new SpringApplicationBuilder(ControlPacientesApplication.class).run();
     }
 

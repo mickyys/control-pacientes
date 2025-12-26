@@ -102,6 +102,7 @@ public class PacientesListController {
 
     private void loadPacientes() {
         List<Paciente> list = pacienteService.findAll();
+        list.sort((p1, p2) -> p1.getNombreCompleto().compareToIgnoreCase(p2.getNombreCompleto()));
         observablePacientes.setAll(list);
         pacientesTable.setItems(observablePacientes);
     }
@@ -114,6 +115,7 @@ public class PacientesListController {
         String ciudad = searchCiudad.getText();
         
         List<Paciente> list = pacienteService.searchAdvanced(nombre, rut, email, ciudad);
+        list.sort((p1, p2) -> p1.getNombreCompleto().compareToIgnoreCase(p2.getNombreCompleto()));
         observablePacientes.setAll(list);
     }
 

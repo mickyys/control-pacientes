@@ -21,6 +21,8 @@
                     <MenuItem text="Exportar a Excel" onAction="#handleExportarExcel"/>
                     <SeparatorMenuItem/>
                     <MenuItem text="Acerca de" onAction="#handleAbout"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Salir" onAction="#handleExit"/>
                 </items>
             </Menu>
         </menus>
@@ -46,12 +48,14 @@
     <!-- Main Content Area -->
     <HBox VBox.vgrow="ALWAYS">
         <!-- Sidebar -->
-        <VBox styleClass="sidebar" prefWidth="250.0" spacing="10.0">
+        <VBox styleClass="sidebar" prefWidth="250.0" spacing="10.0" VBox.vgrow="ALWAYS">
             <padding>
-                <Insets top="20.0" left="15.0" right="15.0"/>
+                <Insets top="20.0" left="15.0" right="15.0" bottom="15.0"/>
             </padding>
             <Button text="Gestionar Pacientes" fx:id="btnPacientes" maxWidth="Infinity" styleClass="sidebar-btn" onAction="#handleShowPacientes"/>
             <Button text="Fichas Médicas" fx:id="btnFichas" maxWidth="Infinity" styleClass="sidebar-btn" onAction="#handleShowFichas"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Button text="Salir" fx:id="btnSalir" maxWidth="Infinity" styleClass="sidebar-btn" onAction="#handleExit"/>
         </VBox>
 
         <!-- Dynamic Content Area -->

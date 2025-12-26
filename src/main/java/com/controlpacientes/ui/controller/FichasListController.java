@@ -6,6 +6,7 @@ import com.controlpacientes.ui.UINavigator;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -34,8 +36,15 @@ public class FichasListController {
     private TableColumn<FichaMedica, String> colDiagnostico;
     @FXML
     private TableColumn<FichaMedica, Void> colAcciones;
+    @FXML
+    private DatePicker searchFecha;
+    @FXML
+    private TextField searchPaciente;
+    @FXML
+    private TextField searchDiagnostico;
 
     private ObservableList<FichaMedica> observableFichas = FXCollections.observableArrayList();
+    private FilteredList<FichaMedica> filteredFichas;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     @FXML
@@ -91,7 +100,40 @@ public class FichasListController {
         List<FichaMedica> list = fichaMedicaService.findAllOrderByFechaDesc();
         observableFichas.clear();
         observableFichas.addAll(list);
-        fichasTable.setItems(observableFichas);
+        
+        // Crear FilteredList para permitir búsqueda
+        filteredFichas = new FilteredList<>(observableFichas, p -> true);
+        fichasTable.setItems(filteredFichas);
+    }
+
+    @FXML
+    private void handleSearch() {
+        LocalDate selectedDate = searchFecha.getValue();
+        String pacienteFilter = searchPaciente.getText().toLowerCase();
+        String diagnosticoFilter = searchDiagnostico.getText().toLowerCase();
+
+        filteredFichas.setPredicate(ficha -> {
+            boolean matchFecha = selectedDate == null || 
+                    ficha.getFechaAtencion().toLocalDate().equals(selectedDate);
+            
+            boolean matchPaciente = pacienteFilter.isEmpty() || 
+                    (ficha.getPaciente() != null && 
+                     ficha.getPaciente().getNombreCompleto().toLowerCase().contains(pacienteFilter));
+            
+            boolean matchDiagnostico = diagnosticoFilter.isEmpty() || 
+                    (ficha.getDiagnostico() != null && 
+                     ficha.getDiagnostico().toLowerCase().contains(diagnosticoFilter));
+
+            return matchFecha && matchPaciente && matchDiagnostico;
+        });
+    }
+
+    @FXML
+    private void handleClearSearch() {
+        searchFecha.setValue(null);
+        searchPaciente.clear();
+        searchDiagnostico.clear();
+        filteredFichas.setPredicate(p -> true);
     }
 
     @FXML

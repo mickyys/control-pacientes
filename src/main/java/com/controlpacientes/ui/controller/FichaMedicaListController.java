@@ -15,8 +15,11 @@ import javafx.stage.Stage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -41,10 +44,18 @@ public class FichaMedicaListController {
     private TableColumn<FichaMedica, Void> colAcciones;
     @FXML
     private Button btnNewFicha;
+    @FXML
+    private TextField searchFecha;
+    @FXML
+    private TextField searchPaciente;
+    @FXML
+    private TextField searchDiagnostico;
 
     private Paciente currentPaciente;
     private ObservableList<FichaMedica> observableFichas = FXCollections.observableArrayList();
+    private List<FichaMedica> allFichas = List.of();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private final DateTimeFormatter searchFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private boolean showingAllFichas = false;
 
     public void setPaciente(Paciente paciente) {
@@ -58,9 +69,10 @@ public class FichaMedicaListController {
         this.currentPaciente = null;
         this.showingAllFichas = true;
         pacienteNameText.setText("Todas las Fichas Médicas");
-        List<FichaMedica> list = fichaMedicaService.findAllOrderByFechaDesc();
+        allFichas = fichaMedicaService.findAllOrderByFechaDesc();
         observableFichas.clear();
-        observableFichas.addAll(list);
+        observableFichas.addAll(allFichas);
+        clearSearchFilters();
     }
 
     @FXML
@@ -87,9 +99,10 @@ public class FichaMedicaListController {
 
     private void loadFichas() {
         if (currentPaciente != null) {
-            List<FichaMedica> list = fichaMedicaService.findByPacienteId(currentPaciente.getId());
+            allFichas = fichaMedicaService.findByPacienteId(currentPaciente.getId());
             observableFichas.clear();
-            observableFichas.addAll(list);
+            observableFichas.addAll(allFichas);
+            clearSearchFilters();
         }
     }
 
@@ -179,5 +192,66 @@ public class FichaMedicaListController {
     @FXML
     private void handleClose() {
         ((Stage) fichasTable.getScene().getWindow()).close();
+    }
+
+    @FXML
+    private void handleSearch() {
+        String fechaStr = searchFecha.getText().trim();
+        String pacienteStr = searchPaciente.getText().trim().toLowerCase();
+        String diagnosticoStr = searchDiagnostico.getText().trim().toLowerCase();
+
+        List<FichaMedica> filtered = allFichas.stream()
+                .filter(ficha -> {
+                    // Filtrar por fecha
+                    if (!fechaStr.isEmpty()) {
+                        try {
+                            LocalDateTime searchDate = searchFormatter.parse(fechaStr, LocalDateTime::from);
+                            
+                            // Comparar solo la fecha (sin la hora)
+                            if (!ficha.getFechaAtencion().toLocalDate().equals(searchDate.toLocalDate())) {
+                                return false;
+                            }
+                        } catch (DateTimeParseException e) {
+                            return false;
+                        }
+                    }
+
+                    // Filtrar por nombre del paciente
+                    if (!pacienteStr.isEmpty()) {
+                        String nombrePaciente = ficha.getPaciente() != null ? 
+                            ficha.getPaciente().getNombreCompleto().toLowerCase() : "";
+                        if (!nombrePaciente.contains(pacienteStr)) {
+                            return false;
+                        }
+                    }
+
+                    // Filtrar por diagnóstico
+                    if (!diagnosticoStr.isEmpty()) {
+                        String diagnostico = ficha.getDiagnostico() != null ? 
+                            ficha.getDiagnostico().toLowerCase() : "";
+                        if (!diagnostico.contains(diagnosticoStr)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                })
+                .collect(Collectors.toList());
+
+        observableFichas.clear();
+        observableFichas.addAll(filtered);
+    }
+
+    @FXML
+    private void handleClearSearch() {
+        clearSearchFilters();
+        observableFichas.clear();
+        observableFichas.addAll(allFichas);
+    }
+
+    private void clearSearchFilters() {
+        searchFecha.clear();
+        searchPaciente.clear();
+        searchDiagnostico.clear();
     }
 }

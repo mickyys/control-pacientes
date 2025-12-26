@@ -21,12 +21,22 @@
     </HBox>
 
     <HBox spacing="10.0" style="-fx-padding: 20 0;">
-        <TextField fx:id="searchNombre" promptText="Buscar por nombre..." HBox.hgrow="ALWAYS" styleClass="search-field"/>
-        <TextField fx:id="searchRut" promptText="Buscar por RUT..." prefWidth="150" styleClass="search-field"/>
-        <TextField fx:id="searchEmail" promptText="Buscar por email..." prefWidth="150" styleClass="search-field"/>
-        <TextField fx:id="searchCiudad" promptText="Buscar por ciudad..." prefWidth="150" styleClass="search-field"/>
-        <Button text="Buscar" styleClass="btn-secondary" onAction="#handleSearch"/>
-        <Button text="Limpiar" styleClass="btn-secondary" onAction="#handleClearSearch"/>
+        <VBox spacing="8" HBox.hgrow="ALWAYS">
+            <Label text="Buscar Pacientes" style="-fx-font-weight: bold; -fx-font-size: 12;"/>
+            <HBox spacing="10.0">
+                <TextField fx:id="searchNombre" promptText="Nombre..." prefWidth="200" styleClass="search-field"/>
+                <TextField fx:id="searchRut" promptText="RUT..." prefWidth="200" styleClass="search-field"/>
+                <TextField fx:id="searchEmail" promptText="Email..." prefWidth="200" styleClass="search-field"/>
+                <TextField fx:id="searchCiudad" promptText="Ciudad..." prefWidth="200" styleClass="search-field"/>
+            </HBox>
+        </VBox>
+        <VBox spacing="8" style="-fx-alignment: bottom-right;">
+            <Region VBox.vgrow="ALWAYS"/>
+            <HBox spacing="10.0">
+                <Button text="Buscar" styleClass="btn-secondary" onAction="#handleSearch"/>
+                <Button text="Limpiar" styleClass="btn-secondary" onAction="#handleClearSearch"/>
+            </HBox>
+        </VBox>
     </HBox>
 
     <TableView fx:id="pacientesTable" VBox.vgrow="ALWAYS" styleClass="modern-table">

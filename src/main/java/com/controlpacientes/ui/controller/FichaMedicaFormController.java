@@ -5,6 +5,7 @@ import com.controlpacientes.model.MedicamentoAtencion;
 import com.controlpacientes.model.Paciente;
 import com.controlpacientes.service.FichaMedicaService;
 import com.controlpacientes.service.PacienteService;
+import com.controlpacientes.service.PDFGeneratorService;
 import com.controlpacientes.util.RutUtils;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -12,7 +13,9 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.print.PrinterJob;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,7 @@ public class FichaMedicaFormController {
 
     private final FichaMedicaService fichaMedicaService;
     private final PacienteService pacienteService;
+    private final PDFGeneratorService pdfGeneratorService;
 
     @FXML
     private Text titleText;
@@ -215,6 +219,18 @@ public class FichaMedicaFormController {
 
             currentFicha.setMedicamentos(new ArrayList<>(observableMedicamentos));
 
+            // Actualizar todos los datos del paciente desde los campos de la ficha
+            if (currentPaciente != null) {
+                currentPaciente.setNombre(pacienteNombreField.getText());
+                currentPaciente.setApellido(pacienteApellidoField.getText());
+                currentPaciente.setEmail(pacienteEmailField.getText());
+                currentPaciente.setTelefono(pacienteTelefonoField.getText());
+                currentPaciente.setCiudad(pacienteCiudadField.getText());
+                currentPaciente.setDireccion(pacienteDireccionField.getText());
+                currentPaciente.setNotasClinicas(pacienteNotasField.getText());
+                pacienteService.save(currentPaciente);
+            }
+
             fichaMedicaService.save(currentFicha);
             closeWindow();
         } catch (Exception e) {
@@ -235,13 +251,38 @@ public class FichaMedicaFormController {
         }
         
         try {
-            // Crear contenido HTML de la ficha
-            String contenidoHTML = generarContenidoHTML();
+            // Obtener ruta por defecto
+            String defaultPath = pdfGeneratorService.generateDefaultFilePath(currentFicha);
             
-            // Aquí se implementaría la lógica para generar el PDF
-            mostrarError("Información", "La funcionalidad de descarga PDF será implementada próximamente");
+            // Mostrar diálogo de selección de directorio
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            directoryChooser.setTitle("Seleccionar carpeta para guardar PDF");
+            directoryChooser.setInitialDirectory(new File(System.getProperty("user.home") + File.separator + "Downloads"));
+            
+            Stage stage = (Stage) btnGuardar.getScene().getWindow();
+            File selectedDirectory = directoryChooser.showDialog(stage);
+            
+            if (selectedDirectory != null) {
+                // Crear el nombre del archivo
+                String fileName = String.format("Ficha_%s_%s.pdf",
+                        currentFicha.getPaciente().getRut().replace("-", ""),
+                        System.currentTimeMillis());
+                
+                String outputPath = selectedDirectory.getAbsolutePath() + File.separator + fileName;
+                
+                // Generar el PDF
+                pdfGeneratorService.generateFichaMedicaPDF(currentFicha, outputPath);
+                
+                // Mostrar mensaje de éxito
+                Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+                alerta.setTitle("Éxito");
+                alerta.setHeaderText(null);
+                alerta.setContentText("PDF generado correctamente en:\n" + outputPath);
+                alerta.showAndWait();
+            }
         } catch (Exception e) {
             mostrarError("Error", "No se pudo descargar el PDF: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

@@ -61,6 +61,22 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>5.0.0</version>
 		</dependency>
+		<!-- iText para generación de PDFs -->
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>kernel</artifactId>
+			<version>7.2.5</version>
+		</dependency>
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>layout</artifactId>
+			<version>7.2.5</version>
+		</dependency>
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>io</artifactId>
+			<version>7.2.5</version>
+		</dependency>
 	</dependencies>
 
 	<build>
