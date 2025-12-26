@@ -39,6 +39,8 @@ public class FichaMedicaListController {
     private TableColumn<FichaMedica, String> colDiagnostico;
     @FXML
     private TableColumn<FichaMedica, Void> colAcciones;
+    @FXML
+    private Button btnNewFicha;
 
     private Paciente currentPaciente;
     private ObservableList<FichaMedica> observableFichas = FXCollections.observableArrayList();
@@ -92,21 +94,15 @@ public class FichaMedicaListController {
     }
 
     private void addButtonToTable() {
-        colAcciones.setCellFactory(param -> new TableCell<>() {
-            private final Button newFichaBtn = new Button("+ Nueva");
+        colAcciones.setCellFactory(param -> new TableCell<>() {            
             private final Button viewBtn = new Button("Ver/Editar");
             private final Button deleteBtn = new Button("Eliminar");
-            private final HBox container = new HBox(10, newFichaBtn, viewBtn, deleteBtn);
+            private final HBox container = new HBox(10, viewBtn, deleteBtn);
 
-            {
-                newFichaBtn.getStyleClass().add("btn-sm-primary");
+            {                
                 viewBtn.getStyleClass().add("btn-sm-outline");
                 deleteBtn.getStyleClass().add("btn-sm-danger");
-                
-                newFichaBtn.setOnAction(event -> {
-                    FichaMedica f = getTableView().getItems().get(getIndex());
-                    handleNewFichaForPaciente(f.getPaciente());
-                });
+                                
                 viewBtn.setOnAction(event -> {
                     FichaMedica f = getTableView().getItems().get(getIndex());
                     handleEditFicha(f);
@@ -127,7 +123,7 @@ public class FichaMedicaListController {
 
     @FXML
     private void handleNewFicha() {
-        if (showingAllFichas) {
+        if (currentPaciente == null) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Para crear una nueva ficha, selecciona un paciente.");
             alert.showAndWait();
             return;

@@ -20,6 +20,7 @@
             <Text fx:id="pacienteNameText" text="Paciente: Cargando..." style="-fx-fill: #6c757d; -fx-font-size: 14px;"/>
         </VBox>
         <Region HBox.hgrow="ALWAYS" />
+        <Button fx:id="btnNewFicha" text="+ Nueva Ficha" styleClass="btn-primary" onAction="#handleNewFicha"/>
     </HBox>
 
     <TableView fx:id="fichasTable" VBox.vgrow="ALWAYS" styleClass="modern-table" style="-fx-margin-top: 20;">

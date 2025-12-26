@@ -31,6 +31,8 @@ public class MedicamentoAtencion {
 
     private String duracion;
 
+    private Integer cantidadRecetar;
+
     @Column(columnDefinition = "TEXT")
     private String indicaciones;
 

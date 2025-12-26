@@ -78,6 +78,18 @@ public class UINavigator {
                 log.warn("No se pudo cargar el CSS: {}", e.getMessage());
             }
             stage.setScene(scene);
+            
+            // Establecer tamaño cercano a pantalla completa sin usar setMaximized
+            if (mainStage != null) {
+                stage.setWidth(mainStage.getWidth() * 0.95);
+                stage.setHeight(mainStage.getHeight() * 0.95);
+                stage.setX(mainStage.getX() + (mainStage.getWidth() - stage.getWidth()) / 2);
+                stage.setY(mainStage.getY() + (mainStage.getHeight() - stage.getHeight()) / 2);
+            } else {
+                stage.setWidth(1200);
+                stage.setHeight(800);
+            }
+            
             stage.showAndWait();
         } catch (IOException e) {
             String errorMsg = "Error al cargar el modal: " + fxmlPath + "\n" + e.getMessage();

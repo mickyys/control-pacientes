@@ -4,6 +4,8 @@ import com.controlpacientes.model.FichaMedica;
 import com.controlpacientes.model.MedicamentoAtencion;
 import com.controlpacientes.model.Paciente;
 import com.controlpacientes.service.FichaMedicaService;
+import com.controlpacientes.service.PacienteService;
+import com.controlpacientes.util.RutUtils;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,9 +14,12 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.print.PrinterJob;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 @Component
@@ -22,9 +27,32 @@ import java.util.ArrayList;
 public class FichaMedicaFormController {
 
     private final FichaMedicaService fichaMedicaService;
+    private final PacienteService pacienteService;
 
     @FXML
     private Text titleText;
+    
+    // Campos del paciente
+    @FXML
+    private TextField pacienteRutField;
+    @FXML
+    private TextField pacienteNombreField;
+    @FXML
+    private TextField pacienteApellidoField;
+    @FXML
+    private TextField pacienteEdadField;
+    @FXML
+    private TextField pacienteEmailField;
+    @FXML
+    private TextField pacienteTelefonoField;
+    @FXML
+    private TextField pacienteCiudadField;
+    @FXML
+    private TextField pacienteDireccionField;
+    @FXML
+    private TextArea pacienteNotasField;
+    
+    // Campos de la ficha médica
     @FXML
     private DatePicker fechaAtencionPicker;
     @FXML
@@ -39,15 +67,9 @@ public class FichaMedicaFormController {
     @FXML
     private TableColumn<MedicamentoAtencion, String> colMedNombre;
     @FXML
-    private TableColumn<MedicamentoAtencion, String> colMedDosis;
-    @FXML
-    private TableColumn<MedicamentoAtencion, String> colMedFrecuencia;
-    @FXML
-    private TableColumn<MedicamentoAtencion, String> colMedDuracion;
-    @FXML
-    private TableColumn<MedicamentoAtencion, String> colMedIndicaciones;
-    @FXML
     private TableColumn<MedicamentoAtencion, Void> colMedAcciones;
+    @FXML
+    private Label medicamentosLabel;
     @FXML
     private Button btnGuardar;
 
@@ -57,6 +79,7 @@ public class FichaMedicaFormController {
 
     @FXML
     public void initialize() {
+        profesionalField.setText("Emilio Alcaino");
         setupTable();
     }
 
@@ -68,44 +91,82 @@ public class FichaMedicaFormController {
         colMedNombre.setCellFactory(TextFieldTableCell.forTableColumn());
         colMedNombre.setOnEditCommit(e -> e.getRowValue().setNombreMedicamento(e.getNewValue()));
 
-        colMedDosis.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getDosis()));
-        colMedDosis.setCellFactory(TextFieldTableCell.forTableColumn());
-        colMedDosis.setOnEditCommit(e -> e.getRowValue().setDosis(e.getNewValue()));
-
-        colMedFrecuencia.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFrecuencia()));
-        colMedFrecuencia.setCellFactory(TextFieldTableCell.forTableColumn());
-        colMedFrecuencia.setOnEditCommit(e -> e.getRowValue().setFrecuencia(e.getNewValue()));
-
-        colMedDuracion.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getDuracion()));
-        colMedDuracion.setCellFactory(TextFieldTableCell.forTableColumn());
-        colMedDuracion.setOnEditCommit(e -> e.getRowValue().setDuracion(e.getNewValue()));
-
-        colMedIndicaciones.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getIndicaciones()));
-        colMedIndicaciones.setCellFactory(TextFieldTableCell.forTableColumn());
-        colMedIndicaciones.setOnEditCommit(e -> e.getRowValue().setIndicaciones(e.getNewValue()));
-
         colMedAcciones.setCellFactory(param -> new TableCell<>() {
-            private final Button deleteBtn = new Button("X");
+            private final Button deleteBtn = new Button("x");
             {
                 deleteBtn.getStyleClass().add("btn-sm-danger");
+                deleteBtn.setStyle("-fx-padding: 5px 8px; -fx-font-size: 14px;");
                 deleteBtn.setOnAction(event -> {
                     MedicamentoAtencion m = getTableView().getItems().get(getIndex());
-                    observableMedicamentos.remove(m);
+                    Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirmacion.setTitle("Confirmar eliminación");
+                    confirmacion.setHeaderText(null);
+                    confirmacion.setContentText("¿Deseas eliminar este medicamento?");
+                    confirmacion.showAndWait().ifPresent(response -> {
+                        if (response == ButtonType.OK) {
+                            observableMedicamentos.remove(m);
+                        }
+                    });
                 });
             }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : deleteBtn);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setAlignment(javafx.geometry.Pos.CENTER);
+                    setGraphic(deleteBtn);
+                }
             }
         });
 
         medicamentosTable.setItems(observableMedicamentos);
+        
+        // Listener para actualizar el contador
+        observableMedicamentos.addListener((javafx.collections.ListChangeListener<MedicamentoAtencion>) c -> {
+            actualizarContadorMedicamentos();
+        });
+    }
+
+    private void actualizarContadorMedicamentos() {
+        medicamentosLabel.setText("Medicamentos (" + observableMedicamentos.size() + ")");
     }
 
     public void setPaciente(Paciente paciente) {
         this.currentPaciente = paciente;
+        cargarDatosPaciente();
+    }
+
+    private void cargarDatosPaciente() {
+        if (currentPaciente != null) {
+            pacienteRutField.setText(RutUtils.formatRut(currentPaciente.getRut() != null ? currentPaciente.getRut() : ""));
+            pacienteNombreField.setText(currentPaciente.getNombre() != null ? currentPaciente.getNombre() : "");
+            pacienteApellidoField.setText(currentPaciente.getApellido() != null ? currentPaciente.getApellido() : "");
+            pacienteEdadField.setText(String.valueOf(calcularEdad(currentPaciente.getFechaNacimiento())));
+            pacienteEmailField.setText(currentPaciente.getEmail() != null ? currentPaciente.getEmail() : "");
+            pacienteTelefonoField.setText(currentPaciente.getTelefono() != null ? currentPaciente.getTelefono() : "");
+            pacienteCiudadField.setText(currentPaciente.getCiudad() != null ? currentPaciente.getCiudad() : "");
+            pacienteDireccionField.setText(currentPaciente.getDireccion() != null ? currentPaciente.getDireccion() : "");
+            pacienteNotasField.setText(currentPaciente.getNotasClinicas() != null ? currentPaciente.getNotasClinicas() : "");
+        }
+    }
+
+    private int calcularEdad(LocalDate fechaNacimiento) {
+        if (fechaNacimiento == null) {
+            return 0;
+        }
+        LocalDate hoy = LocalDate.now();
+        int edad = hoy.getYear() - fechaNacimiento.getYear();
+        
+        if (hoy.getMonthValue() < fechaNacimiento.getMonthValue() ||
+            (hoy.getMonthValue() == fechaNacimiento.getMonthValue() && 
+             hoy.getDayOfMonth() < fechaNacimiento.getDayOfMonth())) {
+            edad--;
+        }
+        
+        return edad;
     }
 
     public void setFicha(FichaMedica ficha) {
@@ -126,9 +187,13 @@ public class FichaMedicaFormController {
 
     @FXML
     private void handleAddMedicamento() {
-        MedicamentoAtencion nuevo = new MedicamentoAtencion();
-        nuevo.setNombreMedicamento("Nuevo Medicamento");
+        MedicamentoAtencion nuevo = MedicamentoAtencion.builder()
+                .nombreMedicamento("")
+                .build();
         observableMedicamentos.add(nuevo);
+        
+        // Hacer scroll a la última fila
+        medicamentosTable.scrollTo(observableMedicamentos.size() - 1);
     }
 
     @FXML
@@ -153,11 +218,7 @@ public class FichaMedicaFormController {
             fichaMedicaService.save(currentFicha);
             closeWindow();
         } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("No se pudo guardar la ficha");
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
+            mostrarError("Error", "No se pudo guardar la ficha: " + e.getMessage());
         }
     }
 
@@ -166,7 +227,147 @@ public class FichaMedicaFormController {
         closeWindow();
     }
 
+    @FXML
+    private void handleDownloadPDF() {
+        if (currentFicha == null || currentFicha.getId() == null) {
+            mostrarError("Error", "Debe guardar la ficha antes de descargar PDF");
+            return;
+        }
+        
+        try {
+            // Crear contenido HTML de la ficha
+            String contenidoHTML = generarContenidoHTML();
+            
+            // Aquí se implementaría la lógica para generar el PDF
+            mostrarError("Información", "La funcionalidad de descarga PDF será implementada próximamente");
+        } catch (Exception e) {
+            mostrarError("Error", "No se pudo descargar el PDF: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handlePrint() {
+        try {
+            Stage stage = (Stage) btnGuardar.getScene().getWindow();
+            PrinterJob printerJob = PrinterJob.createPrinterJob();
+            
+            if (printerJob != null) {
+                // Mostrar diálogo de selección de impresora
+                if (printerJob.showPrintDialog(stage)) {
+                    // Crear un VBox con el contenido a imprimir
+                    VBox printContent = crearContenidoImpresion();
+                    
+                    // Imprimir el contenido
+                    boolean success = printerJob.printPage(printContent);
+                    if (success) {
+                        printerJob.endJob();
+                        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+                        alerta.setTitle("Éxito");
+                        alerta.setHeaderText(null);
+                        alerta.setContentText("Ficha enviada a la impresora correctamente");
+                        alerta.showAndWait();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            mostrarError("Error", "No se pudo imprimir la ficha: " + e.getMessage());
+        }
+    }
+
+    private VBox crearContenidoImpresion() {
+        VBox content = new VBox(10);
+        content.setStyle("-fx-padding: 20; -fx-font-family: 'Arial'; -fx-font-size: 11;");
+        
+        // Título
+        Label titulo = new Label("FICHA MÉDICA");
+        titulo.setStyle("-fx-font-size: 18; -fx-font-weight: bold;");
+        content.getChildren().add(titulo);
+        
+        // Información del paciente
+        Label pacienteLabel = new Label("INFORMACIÓN DEL PACIENTE");
+        pacienteLabel.setStyle("-fx-font-weight: bold; -fx-underline: true;");
+        content.getChildren().add(pacienteLabel);
+        
+        content.getChildren().add(new Label("RUT: " + pacienteRutField.getText()));
+        content.getChildren().add(new Label("Nombre: " + pacienteNombreField.getText() + " " + pacienteApellidoField.getText()));
+        content.getChildren().add(new Label("Edad: " + pacienteEdadField.getText()));
+        content.getChildren().add(new Label("Email: " + pacienteEmailField.getText()));
+        content.getChildren().add(new Label("Teléfono: " + pacienteTelefonoField.getText()));
+        
+        // Información de la ficha
+        Label fichaLabel = new Label("INFORMACIÓN DE LA FICHA");
+        fichaLabel.setStyle("-fx-font-weight: bold; -fx-underline: true; -fx-padding: 10 0 0 0;");
+        content.getChildren().add(fichaLabel);
+        
+        content.getChildren().add(new Label("Fecha: " + fechaAtencionPicker.getValue()));
+        content.getChildren().add(new Label("Profesional: " + profesionalField.getText()));
+        
+        // Motivo
+        Label motivoLabel = new Label("MOTIVO DE LA CONSULTA:");
+        motivoLabel.setStyle("-fx-font-weight: bold; -fx-padding: 10 0 0 0;");
+        content.getChildren().add(motivoLabel);
+        content.getChildren().add(new Label(motivoField.getText()));
+        
+        // Diagnóstico
+        Label diagLabel = new Label("DIAGNÓSTICO:");
+        diagLabel.setStyle("-fx-font-weight: bold; -fx-padding: 10 0 0 0;");
+        content.getChildren().add(diagLabel);
+        content.getChildren().add(new Label(diagnosticoField.getText()));
+        
+        // Medicamentos
+        if (!observableMedicamentos.isEmpty()) {
+            Label medLabel = new Label("MEDICAMENTOS:");
+            medLabel.setStyle("-fx-font-weight: bold; -fx-padding: 10 0 0 0;");
+            content.getChildren().add(medLabel);
+            
+            for (MedicamentoAtencion med : observableMedicamentos) {
+                content.getChildren().add(new Label("• " + med.getNombreMedicamento()));
+            }
+        }
+        
+        return content;
+    }
+
+    private String generarContenidoHTML() {
+        StringBuilder html = new StringBuilder();
+        html.append("<html><body>");
+        html.append("<h1>Ficha Médica</h1>");
+        html.append("<h2>Información del Paciente</h2>");
+        html.append("<p>RUT: ").append(pacienteRutField.getText()).append("</p>");
+        html.append("<p>Nombre: ").append(pacienteNombreField.getText()).append(" ").append(pacienteApellidoField.getText()).append("</p>");
+        html.append("<p>Edad: ").append(pacienteEdadField.getText()).append("</p>");
+        html.append("<p>Email: ").append(pacienteEmailField.getText()).append("</p>");
+        html.append("<p>Teléfono: ").append(pacienteTelefonoField.getText()).append("</p>");
+        html.append("<p>Ciudad: ").append(pacienteCiudadField.getText()).append("</p>");
+        html.append("<p>Dirección: ").append(pacienteDireccionField.getText()).append("</p>");
+        html.append("<h2>Información de la Ficha</h2>");
+        html.append("<p>Fecha: ").append(fechaAtencionPicker.getValue()).append("</p>");
+        html.append("<p>Profesional: ").append(profesionalField.getText()).append("</p>");
+        html.append("<h3>Motivo de la Consulta</h3>");
+        html.append("<p>").append(motivoField.getText()).append("</p>");
+        html.append("<h3>Diagnóstico</h3>");
+        html.append("<p>").append(diagnosticoField.getText()).append("</p>");
+        if (!observableMedicamentos.isEmpty()) {
+            html.append("<h3>Medicamentos</h3>");
+            html.append("<ul>");
+            for (MedicamentoAtencion med : observableMedicamentos) {
+                html.append("<li>").append(med.getNombreMedicamento()).append("</li>");
+            }
+            html.append("</ul>");
+        }
+        html.append("</body></html>");
+        return html.toString();
+    }
+
     private void closeWindow() {
         ((Stage) btnGuardar.getScene().getWindow()).close();
+    }
+
+    private void mostrarError(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 }
