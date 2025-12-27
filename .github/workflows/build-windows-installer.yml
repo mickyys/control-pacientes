@@ -46,8 +46,7 @@ jobs:
             --win-shortcut-prompt `
             --description "Sistema de Control de Pacientes" `
             --vendor "ControlPacientes" `
-            --app-version "1.0.0" `
-            --license-file LICENSE
+            --app-version "1.0.0"
         shell: powershell
         continue-on-error: true
       
