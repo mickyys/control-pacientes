@@ -65,7 +65,7 @@ jobs:
             --app-version "1.0.0" `
             --java-options "-Xmx512m"
           
-          $LASTEXITCODE | Write-Host "jpackage exit code: $_"
+          Write-Host "jpackage exit code: $LASTEXITCODE"
           
           Write-Host "Checking for generated files..."
           Write-Host "Output directory contents:"
