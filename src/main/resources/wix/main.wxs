@@ -12,8 +12,8 @@
              InstallScope="perMachine" 
              Description="Sistema de Control de Pacientes"/>
 
-    <!-- Permitir upgrade -->
-    <MajorUpgrade AllowDowngrades="no"
+    <!-- Permitir upgrade y downgrade -->
+    <MajorUpgrade AllowDowngrades="yes"
                   AllowSameVersionUpgrades="yes"/>
 
     <Media Id="1" Cabinet="ControlPacientes.cab" EmbedCab="yes"/>
