@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+  <Product Id="*" 
+           Name="ControlPacientes" 
+           Language="3082"
+           Version="!(bind.FileVersion.ControlPacientes.exe)" 
+           UpgradeCode="1f765436-33a2-3383-8c67-6c07436fe2d7"
+           Manufacturer="ControlPacientes">
+
+    <Package InstallerVersion="200" 
+             Compressed="yes" 
+             InstallScope="perMachine" 
+             Description="Sistema de Control de Pacientes"/>
+
+    <!-- Permitir downgrade y upgrade -->
+    <MajorUpgrade DowngradeErrorMessage="Una version mas nueva de [ProductName] ya esta instalada." 
+                  AllowDowngrades="yes"
+                  AllowSameVersionUpgrades="yes"/>
+
+    <Media Id="1" Cabinet="ControlPacientes.cab" EmbedCab="yes"/>
+
+    <!-- Detectar Java instalado en el registro de Windows -->
+    <Property Id="JAVA_INSTALLED">
+      <RegistrySearch Id="SearchJava" Root="HKLM" Key="Software\JavaSoft\JDK" Name="CurrentVersion" Type="raw"/>
+    </Property>
+
+    <!-- Detectar Java Runtime instalado -->
+    <Property Id="JAVA_RUNTIME_INSTALLED">
+      <RegistrySearch Id="SearchJavaRuntime" Root="HKLM" Key="Software\JavaSoft\Java Runtime Environment" Name="CurrentVersion" Type="raw"/>
+    </Property>
+
+    <!-- Detectar Java en PATH -->
+    <Property Id="JAVA_EXE">
+      <DirectorySearch Id="SearchJavaExe" Path="[SystemFolder]" FileName="java.exe"/>
+    </Property>
+
+    <!-- Validacion: Java debe estar instalado -->
+    <Condition Message="Java 11 o superior es requerido para ejecutar ControlPacientes.&#10;&#10;Por favor descargue Java desde: https://www.java.com/download&#10;&#10;O instale OpenJDK desde: https://adoptium.net/installation/">
+      <![CDATA[Installed OR JAVA_INSTALLED OR JAVA_RUNTIME_INSTALLED OR JAVA_EXE]]>
+    </Condition>
+
+    <!-- Directorio de instalación -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="ControlPacientes"/>
+      </Directory>
+      <Directory Id="CommonAppDataFolder">
+        <Directory Id="DATADIR" Name="ControlPacientes">
+          <Directory Id="DBDIR" Name="data"/>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <!-- Features -->
+    <Feature Id="ProductFeature" Title="ControlPacientes" Level="1">
+      <!-- Los archivos se incluyen dinamicamente desde jpackage -->
+      <!-- Crear carpeta de datos si no existe -->
+      <ComponentRef Id="cDataDirectory"/>
+    </Feature>
+
+    <!-- Componente para crear y preservar directorio de datos -->
+    <Component Id="cDataDirectory" Directory="DATADIR" Guid="d3e3e3e3-e3e3-e3e3-e3e3-e3e3e3e3e3e3">
+      <!-- Este directorio será creado pero no eliminado durante desinstalación -->
+      <CreateFolder/>
+      <RemoveFolder Id="RemoveDataFolder" On="uninstall"/>
+      <RegistryValue Root="HKCU" Key="Software\ControlPacientes" Name="DataFolder" Value="[DATADIR]" Type="string" KeyPath="yes"/>
+    </Component>
+
+  </Product>
+</Wix>

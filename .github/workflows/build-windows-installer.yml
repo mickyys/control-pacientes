@@ -46,6 +46,12 @@ jobs:
           # Crear directorio de salida para jpackage
           New-Item -ItemType Directory -Path "target\output" -Force | Out-Null
           
+          # Copiar recursos de WiX localizados (español) y configuración
+          New-Item -ItemType Directory -Path "target\wix-resources" -Force | Out-Null
+          Copy-Item "src\main\resources\wix\MsiInstallerStrings_es.wxl" "target\wix-resources\" -Force -ErrorAction SilentlyContinue
+          Copy-Item "src\main\resources\wix\main.wxs" "target\wix-resources\" -Force -ErrorAction SilentlyContinue
+          Copy-Item "src\main\resources\ControlPacientes.properties" "target\wix-resources\" -Force -ErrorAction SilentlyContinue
+          
           Write-Host "Running jpackage with verbose output..."
           jpackage --verbose `
             --input target `
@@ -63,7 +69,13 @@ jobs:
             --description "Sistema de Control de Pacientes" `
             --vendor "ControlPacientes" `
             --app-version "1.0.0" `
-            --java-options "-Xmx512m"
+            --compress zip `
+            --java-options "-Xmx512m" `
+            --java-options "-Dfile.encoding=UTF-8" `
+            --java-options "-Djava.util.logging.config.file=logging.properties" `
+            --module-path C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\19.0.2-7\x64\jmods `
+            --add-modules java.base,java.logging,java.desktop,java.xml,java.datatransfer,jdk.localedata,jdk.charsets `
+            --resource-dir target/wix-resources
           
           Write-Host "jpackage exit code: $LASTEXITCODE"
           

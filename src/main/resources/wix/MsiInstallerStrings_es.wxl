@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="es-ES" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+  <String Id="LaunchApplication">&amp;Iniciar [ProductName]</String>
+  <String Id="InvalidInstallDir">La carpeta de instalación no existe. Por favor seleccione una carpeta válida.</String>
+  <String Id="InstallWindowTitle">Instalador de [ProductName]</String>
+  <String Id="InstallButtonText">&amp;Instalar</String>
+  <String Id="CancelButtonText">Cancelar</String>
+  <String Id="FinishButtonText">&amp;Finalizar</String>
+  <String Id="NextButtonText">&amp;Siguiente</String>
+  <String Id="BackButtonText">&amp;Anterior</String>
+  <String Id="VerifyReadyDlgTitle">Listo para instalar</String>
+  <String Id="VerifyReadyDlgDescription">El instalador está listo para instalar [ProductName] en su equipo.</String>
+  <String Id="VerifyReadyDlgInstallText">Haga clic en Instalar para continuar, o haga clic en Anterior si desea revisar o cambiar cualquier configuración.</String>
+  <String Id="InstallSuccessful">Se ha completado la instalación de [ProductName].</String>
+  <String Id="InstallFailed">Error durante la instalación de [ProductName]. Por favor verifique los registros de instalación.</String>
+  <String Id="WindowTitle">Instalador de [ProductName] [ProductVersion]</String>
+  <String Id="ControlPancelText">Instalar [ProductName]</String>
+  <String Id="BrowseFolder">Seleccionar Carpeta</String>
+</WixLocalization>
