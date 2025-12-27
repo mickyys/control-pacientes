@@ -3,7 +3,7 @@
   <Product Id="*" 
            Name="ControlPacientes" 
            Language="3082"
-           Version="!(bind.FileVersion.ControlPacientes.exe)" 
+           Version="$(var.JpAppVersion)" 
            UpgradeCode="1f765436-33a2-3383-8c67-6c07436fe2d7"
            Manufacturer="ControlPacientes">
 
