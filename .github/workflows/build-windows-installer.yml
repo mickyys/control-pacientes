@@ -27,9 +27,20 @@ jobs:
       - name: Build application with Maven
         run: mvn clean package -DskipTests
       
+      - name: Install WiX Toolset
+        run: |
+          # Instalar Visual C++ Runtime (requerido por WiX)
+          choco install -y wixtoolset
+        shell: powershell
+        continue-on-error: false
+      
       - name: Create MSI Installer with jpackage
         run: |
+          Write-Host "Starting jpackage MSI creation..."
           $iconPath = Resolve-Path "src\main\resources\images\icono.ico"
+          Write-Host "Icon path: $iconPath"
+          $jarFile = Get-ChildItem target\control-pacientes-java-*.jar | Where-Object { $_.Name -notmatch '\.original$' } | Select-Object -First 1
+          Write-Host "JAR file: $($jarFile.FullName)"
           
           jpackage `
             --input target `
@@ -38,7 +49,7 @@ jobs:
             --main-class com.controlpacientes.ControlPacientesApplication `
             --type msi `
             --icon $iconPath `
-            --install-dir "Program Files" `
+            --install-dir "Program Files\ControlPacientes" `
             --win-menu `
             --win-menu-group "ControlPacientes" `
             --win-dir-chooser `
@@ -47,6 +58,10 @@ jobs:
             --description "Sistema de Control de Pacientes" `
             --vendor "ControlPacientes" `
             --app-version "1.0.0"
+          
+          Write-Host "jpackage completed"
+          Write-Host "Generated files:"
+          Get-ChildItem target -Include *.msi | ForEach-Object { Write-Host $_.FullName }
         shell: powershell
         continue-on-error: true
       
@@ -70,8 +85,19 @@ jobs:
         continue-on-error: true
       
       - name: List generated files
-        run: Get-ChildItem -Path target -Include *.msi | Select-Object FullName
+        run: |
+          Write-Host "Searching for MSI files in target directory..."
+          $msiFiles = Get-ChildItem -Path target -Include *.msi -ErrorAction SilentlyContinue
+          if ($msiFiles) {
+            Write-Host "Found MSI files:"
+            $msiFiles | ForEach-Object { Write-Host "  - $($_.FullName) ($('{0:N2}' -f ($_.Length / 1MB)) MB)" }
+          } else {
+            Write-Host "No MSI files found in target directory"
+            Write-Host "Target directory contents:"
+            Get-ChildItem -Path target | ForEach-Object { Write-Host "  - $($_.Name)" }
+          }
         shell: powershell
+        continue-on-error: true
       
       - name: Upload Windows Artifacts
         uses: actions/upload-artifact@v4
