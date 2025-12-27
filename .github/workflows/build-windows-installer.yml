@@ -46,11 +46,10 @@ jobs:
           # Crear directorio de salida para jpackage
           New-Item -ItemType Directory -Path "target\output" -Force | Out-Null
           
-          # Copiar recursos de WiX localizados (español) y configuración
+          # Copiar recursos de WiX localizados (español)
           New-Item -ItemType Directory -Path "target\wix-resources" -Force | Out-Null
           Copy-Item "src\main\resources\wix\MsiInstallerStrings_es.wxl" "target\wix-resources\" -Force -ErrorAction SilentlyContinue
           Copy-Item "src\main\resources\wix\main.wxs" "target\wix-resources\" -Force -ErrorAction SilentlyContinue
-          Copy-Item "src\main\resources\ControlPacientes.properties" "target\wix-resources\" -Force -ErrorAction SilentlyContinue
           
           Write-Host "Running jpackage with verbose output..."
           jpackage --verbose `
