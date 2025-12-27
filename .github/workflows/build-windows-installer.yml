@@ -38,7 +38,7 @@ jobs:
             --main-jar control-pacientes-java-1.0.0.jar `
             --main-class com.controlpacientes.ControlPacientesApplication `
             --type app-image `
-            --icon src/main/resources/images/icono.png `
+            --icon src/main/resources/images/icono.ico `
             --dest target/image `
             --description "Sistema de Control de Pacientes" `
             --vendor "ControlPacientes" `
@@ -62,7 +62,7 @@ jobs:
         run: |
           $jarPath = Resolve-Path "target\control-pacientes-java-1.0.0.jar"
           $outputDir = Resolve-Path "target"
-          $iconPath = Resolve-Path "src\main\resources\images\icono.png"
+          $iconPath = Resolve-Path "src\main\resources\images\icono.ico"
           
           jpackage `
             --input target `
@@ -109,7 +109,7 @@ jobs:
             <stayAlive>false</stayAlive>
             <restartOnCrash>false</restartOnCrash>
             <manifest></manifest>
-            <icon>src\main\resources\images\icono.png</icon>
+            <icon>src\main\resources\images\icono.ico</icon>
             <jre>
               <path></path>
               <bundledJre64Bit>false</bundledJre64Bit>
