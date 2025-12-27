@@ -13,8 +13,7 @@
              Description="Sistema de Control de Pacientes"/>
 
     <!-- Permitir upgrade y downgrade -->
-    <MajorUpgrade AllowDowngrades="yes"
-                  AllowSameVersionUpgrades="yes"/>
+    <MajorUpgrade AllowDowngrades="yes"/>
 
     <Media Id="1" Cabinet="ControlPacientes.cab" EmbedCab="yes"/>
 
