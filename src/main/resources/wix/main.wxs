@@ -12,9 +12,8 @@
              InstallScope="perMachine" 
              Description="Sistema de Control de Pacientes"/>
 
-    <!-- Permitir downgrade y upgrade -->
-    <MajorUpgrade DowngradeErrorMessage="Una version mas nueva de [ProductName] ya esta instalada." 
-                  AllowDowngrades="yes"
+    <!-- Permitir upgrade -->
+    <MajorUpgrade AllowDowngrades="no"
                   AllowSameVersionUpgrades="yes"/>
 
     <Media Id="1" Cabinet="ControlPacientes.cab" EmbedCab="yes"/>
@@ -31,7 +30,7 @@
 
     <!-- Detectar Java en PATH -->
     <Property Id="JAVA_EXE">
-      <DirectorySearch Id="SearchJavaExe" Path="[SystemFolder]" FileName="java.exe"/>
+      <DirectorySearch Id="SearchJavaExe" Path="[SystemFolder]"/>
     </Property>
 
     <!-- Validacion: Java debe estar instalado -->
