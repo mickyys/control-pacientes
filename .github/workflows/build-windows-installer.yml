@@ -29,41 +29,55 @@ jobs:
       
       - name: Install WiX Toolset
         run: |
-          # Instalar Visual C++ Runtime (requerido por WiX)
           choco install -y wixtoolset
         shell: powershell
-        continue-on-error: false
+        continue-on-error: true
       
       - name: Create MSI Installer with jpackage
         run: |
           Write-Host "Starting jpackage MSI creation..."
+          Write-Host "Current directory: $(Get-Location)"
+          Write-Host "Target directory contents:"
+          Get-ChildItem target | ForEach-Object { Write-Host "  - $($_.Name)" }
+          
           $iconPath = Resolve-Path "src\main\resources\images\icono.ico"
           Write-Host "Icon path: $iconPath"
-          $jarFile = Get-ChildItem target\control-pacientes-java-*.jar | Where-Object { $_.Name -notmatch '\.original$' } | Select-Object -First 1
-          Write-Host "JAR file: $($jarFile.FullName)"
           
-          jpackage `
+          # Crear directorio de salida para jpackage
+          New-Item -ItemType Directory -Path "target\output" -Force | Out-Null
+          
+          Write-Host "Running jpackage with verbose output..."
+          jpackage --verbose `
             --input target `
             --name "ControlPacientes" `
             --main-jar control-pacientes-java-1.0.0.jar `
             --main-class com.controlpacientes.ControlPacientesApplication `
             --type msi `
             --icon $iconPath `
+            --dest target/output `
             --install-dir "Program Files\ControlPacientes" `
             --win-menu `
             --win-menu-group "ControlPacientes" `
             --win-dir-chooser `
             --win-shortcut `
-            --win-shortcut-prompt `
             --description "Sistema de Control de Pacientes" `
             --vendor "ControlPacientes" `
-            --app-version "1.0.0"
+            --app-version "1.0.0" `
+            --java-options "-Xmx512m"
           
-          Write-Host "jpackage completed"
-          Write-Host "Generated files:"
-          Get-ChildItem target -Include *.msi | ForEach-Object { Write-Host $_.FullName }
+          $LASTEXITCODE | Write-Host "jpackage exit code: $_"
+          
+          Write-Host "Checking for generated files..."
+          Write-Host "Output directory contents:"
+          Get-ChildItem target/output -Recurse | ForEach-Object { Write-Host "  - $($_.FullName)" }
+          
+          # Copiar MSI al target si está en output
+          if (Test-Path "target/output/*.msi") {
+            Write-Host "Found MSI in output directory, copying to target..."
+            Copy-Item "target/output/*.msi" "target/" -Force
+          }
         shell: powershell
-        continue-on-error: true
+        continue-on-error: false
       
       - name: Clean up unnecessary files
         run: |
