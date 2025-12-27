@@ -25,7 +25,7 @@ jobs:
           cache: maven
       
       - name: Build application with Maven
-        run: mvn clean package -DskipTests -Dmaven.javadoc.skip=true
+        run: mvn clean package -DskipTests
       
       - name: Create MSI Installer with jpackage
         run: |
