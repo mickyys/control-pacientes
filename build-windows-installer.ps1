@@ -103,14 +103,15 @@ try {
         "--type", "msi",
         "--icon", $iconPath,
         "--dest", $OutputDir,
-        "--install-dir", "Program Files",
         "--win-menu",
         "--win-menu-group", $APP_NAME,
         "--win-dir-chooser",
         "--win-shortcut",
         "--description", "Sistema de Control de Pacientes",
         "--vendor", $VENDOR,
-        "--app-version", $Version
+        "--app-version", $Version,
+        "--java-options", "-Xmx512m",
+        "--java-options", "-Dfile.encoding=UTF-8"
     )
     
     Write-Host "Ejecutando: jpackage $($jpackageArgs -join ' ')" -ForegroundColor Gray

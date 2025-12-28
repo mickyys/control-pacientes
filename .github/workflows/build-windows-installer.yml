@@ -46,12 +46,19 @@ jobs:
           # Crear directorio de salida para jpackage
           New-Item -ItemType Directory -Path "target\output" -Force | Out-Null
           
-          # Copiar recursos de WiX localizados (español)
+          # Copiar archivo de localización WiX (español)
           New-Item -ItemType Directory -Path "target\wix-resources" -Force | Out-Null
           Copy-Item "src\main\resources\wix\MsiInstallerStrings_es.wxl" "target\wix-resources\" -Force -ErrorAction SilentlyContinue
           Copy-Item "src\main\resources\wix\main.wxs" "target\wix-resources\" -Force -ErrorAction SilentlyContinue
           
           Write-Host "Running jpackage with verbose output..."
+          
+          # Obtener la ruta del Java runtime automáticamente
+          $javaHome = $env:JAVA_HOME
+          $modulePath = "$javaHome\jmods"
+          Write-Host "Using Java from: $javaHome"
+          Write-Host "Module path: $modulePath"
+          
           jpackage --verbose `
             --input target `
             --name "ControlPacientes" `
@@ -60,7 +67,6 @@ jobs:
             --type msi `
             --icon $iconPath `
             --dest target/output `
-            --install-dir "Program Files\ControlPacientes" `
             --win-menu `
             --win-menu-group "ControlPacientes" `
             --win-dir-chooser `
@@ -69,13 +75,14 @@ jobs:
             --vendor "ControlPacientes" `
             --app-version "1.0.0" `
             --java-options "-Xmx512m" `
-            --java-options "-Dfile.encoding=UTF-8" `
-            --java-options "-Djava.util.logging.config.file=logging.properties" `
-            --module-path C:\hostedtoolcache\windows\Java_Temurin-Hotspot_jdk\19.0.2-7\x64\jmods `
-            --add-modules java.base,java.logging,java.desktop,java.xml,java.datatransfer,jdk.localedata,jdk.charsets `
-            --resource-dir target/wix-resources
+            --java-options "-Dfile.encoding=UTF-8"
           
           Write-Host "jpackage exit code: $LASTEXITCODE"
+          
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "ERROR: jpackage failed with exit code $LASTEXITCODE"
+            exit 1
+          }
           
           Write-Host "Checking for generated files..."
           Write-Host "Output directory contents:"
@@ -85,6 +92,8 @@ jobs:
           if (Test-Path "target/output/*.msi") {
             Write-Host "Found MSI in output directory, copying to target..."
             Copy-Item "target/output/*.msi" "target/" -Force
+          } else {
+            Write-Host "WARNING: No MSI file found in output directory"
           }
         shell: powershell
         continue-on-error: false
