@@ -10,7 +10,7 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.controlpacientes.ui.controller.MainController"
-      prefHeight="700.0" prefWidth="1000.0"
+      prefHeight="900.0" prefWidth="1400.0"
       spacing="0" styleClass="root-container">
 
     <!-- Menu Bar -->
@@ -26,39 +26,160 @@
                 </items>
             </Menu>
         </menus>
-    </MenuBar>
+    </MenuBar>   
 
-    <!-- Header / Navbar -->
-    <HBox styleClass="navbar" alignment="CENTER_LEFT" prefHeight="70.0">
+    <!-- Main Content Area - 2 Columns Layout -->
+    <HBox VBox.vgrow="ALWAYS" spacing="15.0" styleClass="content-area">
         <padding>
-            <Insets left="20.0" right="20.0"/>
+            <Insets top="15.0" left="15.0" right="15.0" bottom="15.0"/>
         </padding>
-        <ImageView fitHeight="50.0" fitWidth="50.0" preserveRatio="true">
-            <image>
-                <Image url="@../images/logo1.png"/>
-            </image>
-        </ImageView>
-        <Text text="Control de Pacientes" styleClass="navbar-title">
-            <HBox.margin>
-                <Insets left="15.0"/>
-            </HBox.margin>
-        </Text>
-    </HBox>
 
-    <!-- Main Content Area -->
-    <HBox VBox.vgrow="ALWAYS">
-        <!-- Sidebar -->
-        <VBox styleClass="sidebar" prefWidth="250.0" spacing="10.0" VBox.vgrow="ALWAYS">
-            <padding>
-                <Insets top="20.0" left="15.0" right="15.0" bottom="15.0"/>
-            </padding>
-            <Button text="Gestionar Pacientes" fx:id="btnPacientes" maxWidth="Infinity" styleClass="sidebar-btn" onAction="#handleShowPacientes"/>
-            <Button text="Fichas Médicas" fx:id="btnFichas" maxWidth="Infinity" styleClass="sidebar-btn" onAction="#handleShowFichas"/>
-            <Region VBox.vgrow="ALWAYS"/>
-            <Button text="Salir" fx:id="btnSalir" maxWidth="Infinity" styleClass="sidebar-btn" onAction="#handleExit"/>
+        <!-- LEFT COLUMN: Patient Information, Medical Records and Medications -->
+        <VBox spacing="15.0" HBox.hgrow="ALWAYS" prefWidth="750.0">
+
+            <!-- PATIENT INFORMATION PANEL - 2 COLUMNS -->
+            <VBox styleClass="panel-compact" spacing="8.0">
+                <padding>
+                    <Insets top="8.0" bottom="8.0" left="8.0" right="8.0"/>
+                </padding>
+              
+                 <HBox spacing="10.0" alignment="CENTER_LEFT">
+                          <Label text="Información del Paciente" styleClass="panel-title"/>
+                 </HBox>
+
+                <HBox spacing="5.0">
+                    <!-- Column 1 -->
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                        <Label text="RUT" styleClass="field-label"/>
+                        <TextField fx:id="tfPacienteRut" promptText="Ej: 12345678-9" styleClass="input-field"/>
+
+                        <Label text="Nombre" styleClass="field-label"/>
+                        <TextField fx:id="tfPacienteNombre" promptText="Nombre completo" styleClass="input-field"/>
+
+                        <Label text="Apellido" styleClass="field-label"/>
+                        <TextField fx:id="tfPacienteApellido" promptText="Apellido" styleClass="input-field"/>
+
+                        <Label text="Email" styleClass="field-label"/>
+                        <TextField fx:id="tfPacienteEmail" promptText="correo@ejemplo.com" styleClass="input-field"/>                                                
+                    </VBox>
+
+                    <!-- Column 2 -->
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                        <Label text="Teléfono" styleClass="field-label"/>
+                        <TextField fx:id="tfPacienteTelefono" promptText="+56 9 9999 9999" styleClass="input-field"/>
+
+                        <Label text="Ciudad" styleClass="field-label"/>
+                        <TextField fx:id="tfPacienteCiudad" promptText="Ciudad de residencia" styleClass="input-field"/>
+
+                        <Label text="Dirección" styleClass="field-label"/>
+                        <TextField fx:id="tfPacienteDireccion" promptText="Dirección completa" styleClass="input-field"/>
+                        
+                   
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- MEDICAL RECORDS AND MEDICATIONS PANEL -->
+            <HBox spacing="15.0" VBox.vgrow="ALWAYS">
+
+                <!-- MEDICAL RECORDS SECTION -->
+                <VBox styleClass="panel-compact" spacing="8.0" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+                    <padding>
+                        <Insets top="8.0" bottom="8.0" left="8.0" right="8.0"/>
+                    </padding>
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <Label text="Fichas Médicas" styleClass="panel-title"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="Limpiar" fx:id="btnFichaLimpiar" styleClass="btn-secondary"/>
+                        <Button text="Guardar" fx:id="btnFichaGuardar" styleClass="btn-primary"/>
+                    </HBox>
+
+                   
+                    <Label text="Historial de Fechas" styleClass="field-label"/>
+                   <ComboBox fx:id="cbFichaFechas" minWidth="150" minHeight="32"/>
+
+                    <Label text="Motivo de Consulta" styleClass="field-label"/>
+                    <TextArea fx:id="taMotivoconsulta" wrapText="true" prefHeight="80.0" styleClass="no-border-textarea" promptText="Describa el motivo de la consulta..." VBox.vgrow="ALWAYS"/>
+
+                    <Label text="Síntesis Diagnóstica" styleClass="field-label"/>
+                    <TextArea fx:id="taSintesisDiagnostica" wrapText="true" prefHeight="80.0" styleClass="no-border-textarea" promptText="Síntesis del diagnóstico..." VBox.vgrow="ALWAYS"/>
+                </VBox>
+
+                <!-- MEDICATIONS SECTION -->
+                <VBox styleClass="panel-compact" spacing="8.0" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" prefWidth="240.0">
+                    <padding>
+                        <Insets top="8.0" bottom="8.0" left="8.0" right="8.0"/>
+                    </padding>
+                    <Label text="Medicamentos" styleClass="panel-title"/>
+
+                    <ScrollPane fitToWidth="true" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
+                        <VBox fx:id="vbMedicamentos" spacing="6.0">
+                            <padding>
+                                <Insets top="5.0" bottom="5.0" left="5.0" right="5.0"/>
+                            </padding>
+                        </VBox>
+                    </ScrollPane>
+                </VBox>
+            </HBox>
         </VBox>
 
-        <!-- Dynamic Content Area -->
-        <VBox fx:id="dynamicContentContainer" HBox.hgrow="ALWAYS" styleClass="content-area"/>
+        <!-- RIGHT COLUMN: Search and Patient List -->
+        <VBox spacing="15.0" HBox.hgrow="ALWAYS" prefWidth="400.0">
+            <!-- SEARCH PANEL -->
+            <VBox styleClass="panel" spacing="10.0">
+                <padding>
+                    <Insets top="15.0" bottom="15.0" left="15.0" right="15.0"/>
+                </padding>
+                <Label text="Buscador de Pacientes" styleClass="panel-title"/>
+
+                <HBox spacing="15.0">
+                    <!-- Column 1 -->
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                        <Label text="RUT" styleClass="field-label"/>
+                        <TextField fx:id="tfBuscaRut" promptText="Buscar por RUT..." styleClass="input-field"/>
+
+                        <Label text="Nombre" styleClass="field-label"/>
+                        <TextField fx:id="tfBuscaNombre" promptText="Buscar por nombre..." styleClass="input-field"/>
+                    </VBox>
+
+                    <!-- Column 2 -->
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                        <Label text="Ciudad" styleClass="field-label"/>
+                        <TextField fx:id="tfBuscaCiudad" promptText="Buscar por ciudad..." styleClass="input-field"/>
+
+                        <Label text="Año Última Visita" styleClass="field-label"/>
+                        <TextField fx:id="tfBuscaAno" promptText="Ej: 2025" styleClass="input-field"/>
+                    </VBox>
+                </HBox>
+
+                <Button text="Buscar" fx:id="btnBuscar" onAction="#handleBuscar" styleClass="btn-primary" maxWidth="Infinity"/>
+                <Button text="Limpiar Búsqueda" fx:id="btnBuscadorLimpiar" onAction="#handleBuscadorLimpiar" styleClass="btn-secondary" maxWidth="Infinity"/>
+
+                <HBox spacing="5.0" alignment="CENTER_LEFT">
+                    <Label text="Resultados:" styleClass="field-label"/>
+                    <Label fx:id="lblResultados" text="0" styleClass="result-count"/>
+                </HBox>
+            </VBox>
+
+            <!-- PATIENTS LIST PANEL -->
+            <VBox styleClass="panel" spacing="10.0" VBox.vgrow="ALWAYS">
+                <padding>
+                    <Insets top="15.0" bottom="15.0" left="15.0" right="15.0"/>
+                </padding>
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <Label text="Listado de Pacientes" styleClass="panel-title"/>
+                </HBox>
+                <TableView fx:id="tvPacientes" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn text="RUT" prefWidth="90.0" fx:id="tcRut"/>
+                        <TableColumn text="Nombre" prefWidth="100.0" fx:id="tcNombre"/>
+                        <TableColumn text="Apellido" prefWidth="100.0" fx:id="tcApellido"/>
+                        <TableColumn text="Ciudad" prefWidth="90.0" fx:id="tcCiudad"/>
+                        <TableColumn text="Última Visita" prefWidth="120.0" fx:id="tcUltimaVisita"/>
+                        <TableColumn text="Eliminar" prefWidth="80.0" fx:id="tcEliminar"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </VBox>
     </HBox>
 </VBox>

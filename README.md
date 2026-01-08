@@ -23,6 +23,7 @@ Esta es una versión en Java del sistema "Control de Pacientes", diseñada como 
 - ✅ **Gestión de Pacientes**: CRUD completo con ventanas modales.
 - ✅ **Validación de RUT**: Lógica de validación chilena integrada.
 - ✅ **Persistencia Local**: Base de datos SQLite que funciona sin configuración adicional.
+- ✅ **Hot Reload**: Cambios en FXML y CSS se reflejan automáticamente sin reiniciar.
 
 ## Ejecución
 
@@ -31,14 +32,34 @@ Esta es una versión en Java del sistema "Control de Pacientes", diseñada como 
 - Maven instalado (`brew install maven` en macOS).
 
 ### Pasos para iniciar
-1. Abrir una terminal en la carpeta del proyecto:
-   ```bash
-   cd control-pacientes-java
-   ```
-2. Compilar y ejecutar la aplicación:
-   ```bash
-   mvn javafx:run
-   ```
+
+#### Modo Desarrollo (con Hot Reload)
+Usa este modo durante el desarrollo para ver cambios en FXML y CSS en tiempo real:
+
+```bash
+./dev.sh
+```
+
+O manualmente:
+```bash
+mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=dev"
+```
+
+**Hot Reload disponible para:**
+- `src/main/resources/fxml/*.fxml`
+- `src/main/resources/css/style.css`
+
+Los cambios se reflejan automáticamente en la interfaz. Para más detalles, ver [HOT_RELOAD_GUIDE.md](HOT_RELOAD_GUIDE.md)
+
+#### Modo Producción
+```bash
+./prod.sh
+```
+
+O manualmente:
+```bash
+mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=prod"
+```
 
 ---
 *Desarrollado como una alternativa multiplataforma al proyecto original en C#.*

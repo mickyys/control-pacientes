@@ -203,21 +203,52 @@ public class FichaMedicaFormController {
     @FXML
     private void handleSave() {
         try {
-            if (currentFicha == null)
+            System.out.println("DEBUG: Iniciando guardado de ficha médica");
+            
+            // Validación básica
+            if (currentPaciente == null) {
+                mostrarError("Error de validación", "Paciente no seleccionado");
+                return;
+            }
+            
+            if (motivoField.getText().isEmpty()) {
+                mostrarError("Error de validación", "El motivo de consulta es obligatorio");
+                return;
+            }
+            
+            if (diagnosticoField.getText().isEmpty()) {
+                mostrarError("Error de validación", "El diagnóstico es obligatorio");
+                return;
+            }
+            
+            if (currentFicha == null) {
                 currentFicha = new FichaMedica();
+                System.out.println("DEBUG: Nueva ficha creada");
+            }
 
             currentFicha.setPaciente(currentPaciente);
+            System.out.println("DEBUG: Paciente asignado: " + currentPaciente.getNombreCompleto());
+            
             // Si es una nueva ficha, usar la hora actual. Si es edición, mantener la fecha original con hora actual
             if (currentFicha.getId() == null) {
                 currentFicha.setFechaAtencion(java.time.LocalDateTime.now());
+                System.out.println("DEBUG: Nueva ficha - fecha establecida a ahora");
             } else {
-                currentFicha.setFechaAtencion(fechaAtencionPicker.getValue().atTime(java.time.LocalTime.now()));
+                if (fechaAtencionPicker.getValue() != null) {
+                    currentFicha.setFechaAtencion(fechaAtencionPicker.getValue().atTime(java.time.LocalTime.now()));
+                } else {
+                    currentFicha.setFechaAtencion(java.time.LocalDateTime.now());
+                }
+                System.out.println("DEBUG: Ficha existente - fecha actualizada");
             }
+            
             currentFicha.setProfesionalNombre(profesionalField.getText());
             currentFicha.setMotivoConsulta(motivoField.getText());
             currentFicha.setDiagnostico(diagnosticoField.getText());
+            currentFicha.setTratamiento(""); // Tratamiento vacío por defecto
 
             currentFicha.setMedicamentos(new ArrayList<>(observableMedicamentos));
+            System.out.println("DEBUG: Medicamentos asignados: " + observableMedicamentos.size());
 
             // Actualizar todos los datos del paciente desde los campos de la ficha
             if (currentPaciente != null) {
@@ -229,11 +260,21 @@ public class FichaMedicaFormController {
                 currentPaciente.setDireccion(pacienteDireccionField.getText());
                 currentPaciente.setNotasClinicas(pacienteNotasField.getText());
                 pacienteService.save(currentPaciente);
+                System.out.println("DEBUG: Paciente guardado");
             }
 
-            fichaMedicaService.save(currentFicha);
+            FichaMedica savedFicha = fichaMedicaService.save(currentFicha);
+            System.out.println("DEBUG: Ficha médica guardada con ID: " + savedFicha.getId());
+            
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Éxito");
+            alert.setHeaderText(null);
+            alert.setContentText("Ficha médica guardada correctamente");
+            alert.showAndWait();
             closeWindow();
         } catch (Exception e) {
+            System.err.println("ERROR al guardar: " + e.getMessage());
+            e.printStackTrace();
             mostrarError("Error", "No se pudo guardar la ficha: " + e.getMessage());
         }
     }

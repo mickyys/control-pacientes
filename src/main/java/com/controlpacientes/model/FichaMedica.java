@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class FichaMedica {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paciente_id")
+    @ToString.Exclude
     private Paciente paciente;
 
     private LocalDateTime fechaAtencion;
@@ -46,6 +48,7 @@ public class FichaMedica {
 
     @OneToMany(mappedBy = "fichaMedica", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @ToString.Exclude
     private List<MedicamentoAtencion> medicamentos = new ArrayList<>();
 
     @PrePersist

@@ -35,7 +35,7 @@ public class JavaFXApplication extends Application {
         loader.setControllerFactory(springContext::getBean);
         Parent root = loader.load();
 
-        Scene scene = new Scene(root, 1000, 700);
+        Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
 
         primaryStage.setTitle("Control de Pacientes");
@@ -50,10 +50,29 @@ public class JavaFXApplication extends Application {
         primaryStage.setScene(scene);
         primaryStage.setMaximized(true);
         primaryStage.show();
+        
+        // Iniciar Hot Reload en modo desarrollo
+        if (isDevMode()) {
+            var hotReloadService = springContext.getBean(com.controlpacientes.ui.HotReloadService.class);
+            hotReloadService.startWatching(scene, uiNavigator);
+        }
+    }
+    
+    private boolean isDevMode() {
+        String profiles = System.getProperty("spring.profiles.active");
+        return profiles == null || !profiles.contains("prod");
     }
 
     @Override
     public void stop() throws Exception {
+        // Detener Hot Reload Service si está activo
+        try {
+            var hotReloadService = springContext.getBean(com.controlpacientes.ui.HotReloadService.class);
+            hotReloadService.stop();
+        } catch (Exception e) {
+            System.err.println("Error deteniendo HotReload: " + e.getMessage());
+        }
+        
         springContext.close();
         Platform.exit();
     }
