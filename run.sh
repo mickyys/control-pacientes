@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script para ejecutar Control Pacientes
+# Script para ejecutar Control Pacientes - Optimizado para startup rápido
 # Uso: ./run.sh
 
 echo "========================================="
@@ -22,6 +22,13 @@ echo "Iniciando Control Pacientes..."
 echo "JAR: $JAR_FILE"
 echo ""
 
-# Ejecutar con perfil de producción por defecto
-java -jar "$JAR_FILE" --spring.profiles.active=prod
+# Ejecutar con opciones JVM optimizadas para startup rápido
+java \
+  -XX:+UseG1GC \
+  -XX:MaxGCPauseMillis=200 \
+  -XX:+ParallelRefProcEnabled \
+  -XX:G1HeapRegionSize=16M \
+  -Djava.awt.headless=false \
+  -jar "$JAR_FILE" \
+  --spring.profiles.active=prod
 

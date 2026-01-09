@@ -1,5 +1,5 @@
 @echo off
-REM Script para ejecutar Control Pacientes en Windows
+REM Script para ejecutar Control Pacientes - Optimizado para startup rapido
 REM Uso: run.bat
 
 echo =========================================
@@ -24,8 +24,16 @@ echo Iniciando Control Pacientes...
 echo JAR: !JAR_FILE!
 echo.
 
-REM Ejecutar con perfil de produccion y configuracion de JavaFX para Windows
-java --add-modules javafx.controls,javafx.fxml -Djdk.gtk.version=2 -jar "!JAR_FILE!" --spring.profiles.active=prod
+REM Ejecutar con opciones JVM optimizadas para startup rapido y configuracion de JavaFX
+java ^
+  -XX:+UseG1GC ^
+  -XX:MaxGCPauseMillis=200 ^
+  -XX:+ParallelRefProcEnabled ^
+  -XX:G1HeapRegionSize=16M ^
+  -Djdk.gtk.version=2 ^
+  --add-modules javafx.controls,javafx.fxml ^
+  -jar "!JAR_FILE!" ^
+  --spring.profiles.active=prod
 
 pause
 
