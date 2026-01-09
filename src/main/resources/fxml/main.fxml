@@ -49,35 +49,51 @@
                           <Button text="+ Nuevo Paciente" fx:id="btnNewPaciente" onAction="#handleNewPaciente" styleClass="btn-sm-primary"/>
                  </HBox>
 
+                <!-- Row 1: RUT, Nombre, Apellido -->
                 <HBox spacing="5.0" fx:id="pacienteColumnsContainer">
-                    <!-- Column 1 -->
+                    <!-- Column 1: RUT -->
                     <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                         <Label text="RUT" styleClass="field-label"/>
                         <TextField fx:id="tfPacienteRut" promptText="Ej: 12345678-9" styleClass="input-field" disable="true"/>
+                    </VBox>
 
+                    <!-- Column 2: Nombre -->
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                         <Label text="Nombre" styleClass="field-label"/>
                         <TextField fx:id="tfPacienteNombre" promptText="Nombre completo" styleClass="input-field" disable="true"/>
                     </VBox>
 
-                    <!-- Column 2 -->
+                    <!-- Column 3: Apellido -->
                     <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                         <Label text="Apellido" styleClass="field-label"/>
                         <TextField fx:id="tfPacienteApellido" promptText="Apellido" styleClass="input-field" disable="true"/>
+                    </VBox>
+                </HBox>
 
+                <!-- Row 2: Teléfono, Email, Dirección, Ciudad -->
+                <HBox spacing="5.0">
+                    <!-- Column 1: Teléfono -->
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                        <Label text="Teléfono" styleClass="field-label"/>
+                        <TextField fx:id="tfPacienteTelefono" promptText="+56 9 9999 9999" styleClass="input-field" disable="true"/>
+                    </VBox>
+
+                    <!-- Column 2: Email -->
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                         <Label text="Email" styleClass="field-label"/>
                         <TextField fx:id="tfPacienteEmail" promptText="correo@ejemplo.com" styleClass="input-field" disable="true"/>
                     </VBox>
 
-                    <!-- Column 3 -->
+                    <!-- Column 3: Dirección -->
                     <VBox spacing="8.0" HBox.hgrow="ALWAYS">
-                        <Label text="Teléfono" styleClass="field-label"/>
-                        <TextField fx:id="tfPacienteTelefono" promptText="+56 9 9999 9999" styleClass="input-field" disable="true"/>
-
-                        <Label text="Ciudad" styleClass="field-label"/>
-                        <TextField fx:id="tfPacienteCiudad" promptText="Ciudad de residencia" styleClass="input-field" disable="true"/>
-
                         <Label text="Dirección" styleClass="field-label"/>
                         <TextField fx:id="tfPacienteDireccion" promptText="Dirección completa" styleClass="input-field" disable="true"/>
+                    </VBox>
+
+                    <!-- Column 4: Ciudad -->
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                        <Label text="Ciudad" styleClass="field-label"/>
+                        <TextField fx:id="tfPacienteCiudad" promptText="Ciudad de residencia" styleClass="input-field" disable="true"/>
                     </VBox>
                 </HBox>
             </VBox>

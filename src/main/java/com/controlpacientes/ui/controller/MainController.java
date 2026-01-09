@@ -93,6 +93,7 @@ public class MainController {
         setupTableColumns();
         setupListeners();
         setupResponsiveLayout();
+        setupTabNavigation();
         cargarPacientes();
         limpiarFormularioPaciente();
         crearCamposMedicamentos();
@@ -201,6 +202,22 @@ public class MainController {
                 }
             }
         });
+    }
+
+    private void setupTabNavigation() {
+        // Configurar el orden de tabulación para los campos del paciente
+        // Fila 1: RUT -> Nombre -> Apellido
+        // Fila 2: Teléfono -> Email -> Dirección -> Ciudad
+        // El orden natural debería funcionar ya que los campos están en orden en el FXML
+        
+        // Asegurar que los campos tengan focusTraversable habilitado
+        tfPacienteRut.setFocusTraversable(true);
+        tfPacienteNombre.setFocusTraversable(true);
+        tfPacienteApellido.setFocusTraversable(true);
+        tfPacienteTelefono.setFocusTraversable(true);
+        tfPacienteEmail.setFocusTraversable(true);
+        tfPacienteDireccion.setFocusTraversable(true);
+        tfPacienteCiudad.setFocusTraversable(true);
     }
 
     private void cargarPacientes() {
@@ -824,6 +841,11 @@ public class MainController {
     private void attachWindowResizeListener() {
         Stage stage = (Stage) mainContentHBox.getScene().getWindow();
         
+        // Verificar que el stage no sea nulo
+        if (stage == null) {
+            return;
+        }
+        
         // Listener para cambios de ancho
         stage.widthProperty().addListener((obs, oldVal, newVal) -> 
             updateResponsiveLayout(newVal.doubleValue(), stage.getHeight())
@@ -843,17 +865,15 @@ public class MainController {
         
         if (isSmallScreen) {
             // Para pantallas pequeñas: cambiar a layout apilado
-            mainContentHBox.setOrientation(Orientation.VERTICAL);
             leftColumn.setPrefWidth(Double.MAX_VALUE);
             rightColumn.setPrefWidth(Double.MAX_VALUE);
         } else {
             // Para pantallas grandes: mantener layout horizontal
-            mainContentHBox.setOrientation(Orientation.HORIZONTAL);
             leftColumn.setPrefWidth(750.0);
             rightColumn.setPrefWidth(400.0);
         }
     }
-}
+
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alert = new Alert(tipo);
         alert.setTitle(titulo);
