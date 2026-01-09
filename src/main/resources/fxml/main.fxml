@@ -45,34 +45,36 @@
               
                  <HBox spacing="10.0" alignment="CENTER_LEFT">
                           <Label text="Información del Paciente" styleClass="panel-title"/>
+                          <Region HBox.hgrow="ALWAYS"/>
+                          <Button text="+ Nuevo Paciente" fx:id="btnNewPaciente" onAction="#handleNewPaciente" styleClass="btn-sm-primary"/>
                  </HBox>
 
                 <HBox spacing="5.0">
                     <!-- Column 1 -->
                     <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                         <Label text="RUT" styleClass="field-label"/>
-                        <TextField fx:id="tfPacienteRut" promptText="Ej: 12345678-9" styleClass="input-field"/>
+                        <TextField fx:id="tfPacienteRut" promptText="Ej: 12345678-9" styleClass="input-field" disable="true"/>
 
                         <Label text="Nombre" styleClass="field-label"/>
-                        <TextField fx:id="tfPacienteNombre" promptText="Nombre completo" styleClass="input-field"/>
+                        <TextField fx:id="tfPacienteNombre" promptText="Nombre completo" styleClass="input-field" disable="true"/>
 
                         <Label text="Apellido" styleClass="field-label"/>
-                        <TextField fx:id="tfPacienteApellido" promptText="Apellido" styleClass="input-field"/>
+                        <TextField fx:id="tfPacienteApellido" promptText="Apellido" styleClass="input-field" disable="true"/>
 
                         <Label text="Email" styleClass="field-label"/>
-                        <TextField fx:id="tfPacienteEmail" promptText="correo@ejemplo.com" styleClass="input-field"/>                                                
+                        <TextField fx:id="tfPacienteEmail" promptText="correo@ejemplo.com" styleClass="input-field" disable="true"/>                                                
                     </VBox>
 
                     <!-- Column 2 -->
                     <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                         <Label text="Teléfono" styleClass="field-label"/>
-                        <TextField fx:id="tfPacienteTelefono" promptText="+56 9 9999 9999" styleClass="input-field"/>
+                        <TextField fx:id="tfPacienteTelefono" promptText="+56 9 9999 9999" styleClass="input-field" disable="true"/>
 
                         <Label text="Ciudad" styleClass="field-label"/>
-                        <TextField fx:id="tfPacienteCiudad" promptText="Ciudad de residencia" styleClass="input-field"/>
+                        <TextField fx:id="tfPacienteCiudad" promptText="Ciudad de residencia" styleClass="input-field" disable="true"/>
 
                         <Label text="Dirección" styleClass="field-label"/>
-                        <TextField fx:id="tfPacienteDireccion" promptText="Dirección completa" styleClass="input-field"/>
+                        <TextField fx:id="tfPacienteDireccion" promptText="Dirección completa" styleClass="input-field" disable="true"/>
                         
                    
                     </VBox>
@@ -90,8 +92,8 @@
                     <HBox spacing="10.0" alignment="CENTER_LEFT">
                         <Label text="Fichas Médicas" styleClass="panel-title"/>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Button text="Limpiar" fx:id="btnFichaLimpiar" styleClass="btn-secondary"/>
-                        <Button text="Guardar" fx:id="btnFichaGuardar" styleClass="btn-primary"/>
+                        <Button text="Limpiar" fx:id="btnFichaLimpiar" onAction="#handleFichaLimpiar" styleClass="btn-secondary"/>
+                        <Button text="Guardar" fx:id="btnFichaGuardar" onAction="#handleFichaGuardar" styleClass="btn-primary"/>
                     </HBox>
 
                    

@@ -15,6 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class MainController {
 
     private final PacienteService pacienteService;
@@ -41,6 +43,7 @@ public class MainController {
     @FXML private TextField tfPacienteTelefono;
     @FXML private TextField tfPacienteCiudad;
     @FXML private TextField tfPacienteDireccion;
+    @FXML private Button btnNewPaciente;
     @FXML private Button btnPacienteNuevo;
     @FXML private Button btnPacienteEditar;
     @FXML private Button btnPacienteEliminar;
@@ -191,10 +194,14 @@ public class MainController {
     }
 
     private void cargarPacientes() {
+        log.info("Cargando lista de pacientes...");
         List<Paciente> pacientes = pacienteService.findAll();
+        log.info("Total pacientes en BD: {}", pacientes.size());
+        
         // Ordenar alfabéticamente por nombre
         pacientes.sort(Comparator.comparing(p -> p.getNombre() != null ? p.getNombre() : ""));
         tvPacientes.getItems().setAll(pacientes);
+        log.info("Tabla de pacientes actualizada con {} registros", pacientes.size());
     }
 
     @FXML
@@ -320,6 +327,7 @@ public class MainController {
 
     @FXML
     private void handleFichaLimpiar() {
+        log.info("Limpiando formulario de ficha médica");
         taMotivoconsulta.clear();
         taSintesisDiagnostica.clear();
         limpiarMedicamentos();
@@ -327,60 +335,87 @@ public class MainController {
 
     @FXML
     private void handleFichaGuardar() {
+        log.info("=== GUARDAR FICHA MÉDICA ===");
         try {
             // Validar que RUT y Nombre sean obligatorios
-            if (tfPacienteRut.getText().trim().isEmpty() || tfPacienteNombre.getText().trim().isEmpty()) {
+            String rut = tfPacienteRut.getText().trim();
+            String nombre = tfPacienteNombre.getText().trim();
+            
+            log.info("Validando datos: RUT='{}', Nombre='{}'", rut, nombre);
+            
+            if (rut.isEmpty() || nombre.isEmpty()) {
+                log.warn("VALIDACIÓN FALLIDA: RUT o Nombre vacíos");
                 mostrarAlerta(Alert.AlertType.ERROR, "Error", "RUT y Nombre del paciente son requeridos");
                 return;
             }
 
+            log.info("Validación exitosa");
+            
             // Crear paciente si no existe
             if (pacienteSeleccionado == null) {
+                log.info("Creando nuevo paciente");
                 pacienteSeleccionado = new Paciente();
+            } else {
+                log.info("Usando paciente existente con ID: {}", pacienteSeleccionado.getId());
             }
 
             // Guardar información del paciente
-            pacienteSeleccionado.setRut(tfPacienteRut.getText().trim());
-            pacienteSeleccionado.setNombre(tfPacienteNombre.getText().trim());
+            log.info("Estableciendo datos del paciente...");
+            pacienteSeleccionado.setRut(rut);
+            pacienteSeleccionado.setNombre(nombre);
             pacienteSeleccionado.setApellido(tfPacienteApellido.getText().trim());
             pacienteSeleccionado.setEmail(tfPacienteEmail.getText().trim());
             pacienteSeleccionado.setTelefono(tfPacienteTelefono.getText().trim());
             pacienteSeleccionado.setCiudad(tfPacienteCiudad.getText().trim());
             pacienteSeleccionado.setDireccion(tfPacienteDireccion.getText().trim());
             
+            log.info("Guardando paciente en BD...");
             Paciente pacienteGuardado = pacienteService.save(pacienteSeleccionado);
             pacienteSeleccionado = pacienteGuardado;
+            log.info("Paciente guardado con ID: {}", pacienteGuardado.getId());
 
             // Crear o editar ficha médica
             FichaMedica ficha;
             if (fichaSeleccionada != null && fichaSeleccionada.getId() != null) {
                 // Editar ficha existente
+                log.info("Editando ficha existente con ID: {}", fichaSeleccionada.getId());
                 ficha = fichaSeleccionada;
             } else {
                 // Crear nueva ficha
+                log.info("Creando nueva ficha médica");
                 ficha = new FichaMedica();
                 ficha.setPaciente(pacienteGuardado);
                 ficha.setFechaAtencion(LocalDateTime.now());
             }
             
-            ficha.setMotivoConsulta(taMotivoconsulta.getText());
-            ficha.setDiagnostico(taSintesisDiagnostica.getText());
+            String motivo = taMotivoconsulta.getText().trim();
+            String diagnostico = taSintesisDiagnostica.getText().trim();
+            log.info("Motivo consulta: '{}', Diagnóstico: '{}'", motivo, diagnostico);
+            
+            ficha.setMotivoConsulta(motivo);
+            ficha.setDiagnostico(diagnostico);
 
+            log.info("Guardando ficha médica en BD...");
             FichaMedica fichaguardada = fichaMedicaService.save(ficha);
             fichaSeleccionada = fichaguardada;
+            log.info("Ficha médica guardada con ID: {}", fichaguardada.getId());
 
             // Guardar medicamentos desde los TextFields
             // Primero eliminar medicamentos existentes si es edición
             if (fichaguardada.getId() != null && !medicamentosActuales.isEmpty()) {
+                log.info("Eliminando medicamentos existentes: {}", medicamentosActuales.size());
                 for (MedicamentoAtencion med : medicamentosActuales) {
                     if (med.getId() != null) {
                         medicamentoService.delete(med.getId());
+                        log.info("Medicamento eliminado: {}", med.getId());
                     }
                 }
                 medicamentosActuales.clear();
             }
 
             // Guardar nuevos medicamentos
+            log.info("Procesando medicamentos...");
+            int medicamentosGuardados = 0;
             int indice = 0;
             for (javafx.scene.Node node : vbMedicamentos.getChildren()) {
                 if (node instanceof HBox) {
@@ -393,18 +428,25 @@ public class MainController {
                             med.setFichaMedica(fichaguardada);
                             med.setNombreMedicamento(nombreMedicamento);
                             medicamentoService.save(med);
+                            medicamentosGuardados++;
+                            log.info("Medicamento guardado: '{}'", nombreMedicamento);
                         }
                     }
                 }
                 indice++;
             }
+            log.info("Total medicamentos guardados: {}", medicamentosGuardados);
 
+            log.info("=== GUARDADO EXITOSO ===");
             mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "Paciente y ficha médica guardados correctamente");
             habilitarCamposPaciente(false);
             cargarFichasDelPaciente();
             cargarPacientes();
+            log.info("Tabla de pacientes actualizada");
         } catch (Exception e) {
+            log.error("ERROR AL GUARDAR", e);
             mostrarAlerta(Alert.AlertType.ERROR, "Error", "Error al guardar: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -420,6 +462,7 @@ public class MainController {
 
         // Los campos son editables al seleccionar un paciente
         habilitarCamposPaciente(true);
+        habilitarCamposFichaMedica(true);
         cargarFichasDelPaciente();
     }
 
@@ -427,8 +470,8 @@ public class MainController {
         if (pacienteSeleccionado != null) {
             List<FichaMedica> fichas = fichaMedicaService.findByPacienteId(pacienteSeleccionado.getId());
             
-            // Formatear fechas a formato dd/MM/yyyy
-            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            // Formatear fechas a formato dd/MM/yyyy HH:mm para incluir la hora y diferenciar fichas del mismo día
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
             List<String> fechasFormateadas = fichas.stream()
                     .map(FichaMedica::getFechaAtencion)
                     .sorted(Comparator.reverseOrder())
@@ -436,7 +479,7 @@ public class MainController {
                     .collect(Collectors.toList());
             
             // Agregar la fecha de hoy al principio para crear una nueva ficha
-            String fechaHoy = java.time.LocalDate.now().format(formatter);
+            String fechaHoy = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             fechasFormateadas.add(0, fechaHoy + " (Nueva)");
             
             cbFichaFechas.getItems().setAll(fechasFormateadas);
@@ -472,13 +515,20 @@ public class MainController {
     }
 
     private void cargarFichaMedicaPorFecha(Paciente paciente, String fechaFormateada) {
-        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        java.time.LocalDate fechaBuscada = java.time.LocalDate.parse(fechaFormateada, formatter);
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        java.time.LocalDateTime fechaBuscada = java.time.LocalDateTime.parse(fechaFormateada, formatter);
         
         List<FichaMedica> fichas = fichaMedicaService.findByPacienteId(paciente.getId())
                 .stream()
-                .filter(f -> f.getFechaAtencion().toLocalDate().equals(fechaBuscada))
-                .sorted(Comparator.comparing(FichaMedica::getFechaAtencion).reversed())
+                .filter(f -> {
+                    // Comparar por fecha y hora exacta (hasta minutos)
+                    java.time.LocalDateTime fechaFicha = f.getFechaAtencion();
+                    return fechaFicha.getYear() == fechaBuscada.getYear() &&
+                           fechaFicha.getMonthValue() == fechaBuscada.getMonthValue() &&
+                           fechaFicha.getDayOfMonth() == fechaBuscada.getDayOfMonth() &&
+                           fechaFicha.getHour() == fechaBuscada.getHour() &&
+                           fechaFicha.getMinute() == fechaBuscada.getMinute();
+                })
                 .collect(Collectors.toList());
 
         if (!fichas.isEmpty()) {
@@ -562,6 +612,7 @@ public class MainController {
         fichaSeleccionada = null;
         limpiarMedicamentos();
         habilitarCamposPaciente(false);
+        habilitarCamposFichaMedica(false);
     }
 
     private void habilitarCamposPaciente(boolean habilitar) {
@@ -572,6 +623,54 @@ public class MainController {
         tfPacienteTelefono.setDisable(!habilitar);
         tfPacienteCiudad.setDisable(!habilitar);
         tfPacienteDireccion.setDisable(!habilitar);
+    }
+
+    @FXML
+    private void handleNewPaciente() {
+        log.info("=== NUEVO PACIENTE ===");
+        // Crear un nuevo paciente vacío
+        pacienteSeleccionado = new Paciente();
+        log.info("Paciente nuevo creado: {}", pacienteSeleccionado);
+        
+        // Habilitar los campos del paciente para edición
+        habilitarCamposPaciente(true);
+        log.info("Campos de paciente habilitados");
+        
+        // Limpiar los campos del paciente
+        tfPacienteRut.clear();
+        tfPacienteNombre.clear();
+        tfPacienteApellido.clear();
+        tfPacienteEmail.clear();
+        tfPacienteTelefono.clear();
+        tfPacienteCiudad.clear();
+        tfPacienteDireccion.clear();
+        
+        // Habilitar y limpiar la sección de fichas médicas
+        habilitarCamposFichaMedica(true);
+        log.info("Campos de ficha médica habilitados");
+        
+        // Agregar la fecha de hoy con "(Nueva)" al cbFichaFechas
+        String fechaHoy = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        cbFichaFechas.getItems().clear();
+        cbFichaFechas.getItems().add(fechaHoy + " (Nueva)");
+        cbFichaFechas.getSelectionModel().select(0);
+        log.info("Fecha hoy agregada al combo: {}", fechaHoy);
+        
+        taMotivoconsulta.clear();
+        taSintesisDiagnostica.clear();
+        limpiarMedicamentos();
+        
+        // Establecer foco en el primer campo
+        tfPacienteRut.requestFocus();
+        log.info("Foco establecido en RUT");
+    }
+
+    private void habilitarCamposFichaMedica(boolean habilitar) {
+        cbFichaFechas.setDisable(!habilitar);
+        taMotivoconsulta.setDisable(!habilitar);
+        taSintesisDiagnostica.setDisable(!habilitar);
+        btnFichaGuardar.setDisable(!habilitar);
+        btnFichaLimpiar.setDisable(!habilitar);
     }
 
     @FXML

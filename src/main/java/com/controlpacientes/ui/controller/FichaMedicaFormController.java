@@ -55,6 +55,8 @@ public class FichaMedicaFormController {
     private TextField pacienteDireccionField;
     @FXML
     private TextArea pacienteNotasField;
+    @FXML
+    private Button btnNewPaciente;
     
     // Campos de la ficha médica
     @FXML
@@ -187,6 +189,39 @@ public class FichaMedicaFormController {
             fechaAtencionPicker.setValue(java.time.LocalDate.now());
             profesionalField.setText("Emilio Alcaino");
         }
+    }
+
+    @FXML
+    private void handleNewPaciente() {
+        // Habilitar los campos del paciente
+        setPatientFieldsEnabled(true);
+        
+        // Limpiar los datos del paciente actual
+        currentPaciente = new Paciente();
+        pacienteRutField.clear();
+        pacienteNombreField.clear();
+        pacienteApellidoField.clear();
+        pacienteEdadField.clear();
+        pacienteEmailField.clear();
+        pacienteTelefonoField.clear();
+        pacienteCiudadField.clear();
+        pacienteDireccionField.clear();
+        pacienteNotasField.clear();
+        
+        // Establecer foco en el primer campo
+        pacienteRutField.requestFocus();
+    }
+
+    private void setPatientFieldsEnabled(boolean enabled) {
+        pacienteNombreField.setDisable(!enabled);
+        pacienteApellidoField.setDisable(!enabled);
+        pacienteEdadField.setDisable(!enabled);
+        pacienteEmailField.setDisable(!enabled);
+        pacienteTelefonoField.setDisable(!enabled);
+        pacienteCiudadField.setDisable(!enabled);
+        pacienteDireccionField.setDisable(!enabled);
+        pacienteNotasField.setDisable(!enabled);
+        pacienteRutField.setDisable(!enabled);
     }
 
     @FXML
