@@ -24,8 +24,8 @@ echo Iniciando Control Pacientes...
 echo JAR: !JAR_FILE!
 echo.
 
-REM Ejecutar con perfil de produccion por defecto
-java -jar "!JAR_FILE!" --spring.profiles.active=prod
+REM Ejecutar con perfil de produccion y configuracion de JavaFX para Windows
+java --add-modules javafx.controls,javafx.fxml -Djdk.gtk.version=2 -jar "!JAR_FILE!" --spring.profiles.active=prod
 
 pause
 
