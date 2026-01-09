@@ -1,0 +1,27 @@
+# Maven
+target/
+*.jar
+*.war
+*.ear
+*.zip
+dependency-reduced-pom.xml
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.classpath
+.project
+.settings/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Application
+*.db
+control_pacientes.db
+*.log
