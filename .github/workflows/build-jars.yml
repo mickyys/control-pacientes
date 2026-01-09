@@ -1,0 +1,110 @@
+name: Build JAR Artifacts
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  build-jars:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK 19
+        uses: actions/setup-java@v4
+        with:
+          java-version: '19'
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: Build Development JAR
+        run: mvn clean package -DskipTests
+      
+      - name: Build Production JAR
+        run: mvn package -Pprod -DskipTests
+      
+      - name: Verify JAR files
+        run: |
+          echo "=== JAR Files Generated ==="
+          ls -lh target/*.jar
+          echo ""
+          echo "=== JAR Integrity Check ==="
+          file target/*.jar
+          echo ""
+          echo "=== JAR Contents Sample ==="
+          jar tf target/control-pacientes.jar | head -20
+      
+      - name: Upload JAR Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: control-pacientes-jars
+          path: |
+            target/control-pacientes.jar
+            target/control-pacientes-java-1.0.0.jar
+          retention-days: 30
+      
+      - name: Create Release with JARs
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            target/control-pacientes.jar
+            target/control-pacientes-java-1.0.0.jar
+          draft: false
+          prerelease: false
+          body: |
+            ## Control Pacientes JAR Release
+            
+            ### Available JARs
+            
+            #### Production JAR (Recommended)
+            **`control-pacientes.jar`** (205 MB)
+            - Fully optimized for production
+            - Minimal logging (WARN level)
+            - Database validation mode (no auto-creation)
+            - G1 Garbage Collector tuning
+            
+            ##### Run in Production (macOS/Linux)
+            ```bash
+            java -server -XX:+UseG1GC -Xms1g -Xmx2g -jar control-pacientes.jar
+            ```
+            
+            ##### Run in Production (Windows)
+            ```cmd
+            java -server -XX:+UseG1GC -Xms1g -Xmx2g -jar control-pacientes.jar
+            ```
+            
+            #### Development JAR
+            **`control-pacientes-java-1.0.0.jar`** (1.4 MB)
+            - Lightweight for testing and development
+            - Full debug logging available
+            - Smaller size for quick transfers
+            
+            ##### Run Development
+            ```bash
+            java -jar control-pacientes-java-1.0.0.jar --spring.profiles.active=dev
+            ```
+            
+            ### System Requirements
+            - **Java 19+** (required)
+            - **RAM**: 2+ GB recommended
+            - **Storage**: 500 MB free space
+            - **Supported OS**: Windows 10+, macOS 10.14+, Linux
+            
+            ### Quick Start
+            1. Ensure Java 19+ is installed
+            2. Download JAR file
+            3. Run: `java -jar control-pacientes.jar`
+            4. Application will create/use SQLite database in working directory
+            
+            ### Documentation
+            For detailed setup and troubleshooting, see JAR_PRODUCTIVO.md in the repository.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

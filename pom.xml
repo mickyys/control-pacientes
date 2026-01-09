@@ -124,4 +124,66 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<!-- Production Profile -->
+	<profiles>
+		<profile>
+			<id>prod</id>
+			<properties>
+				<maven.test.skip>true</maven.test.skip>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+						<configuration>
+							<mainClass>com.controlpacientes.ControlPacientesApplication</mainClass>
+							<finalName>control-pacientes</finalName>
+							<excludes>
+								<exclude>
+									<groupId>org.projectlombok</groupId>
+									<artifactId>lombok</artifactId>
+								</exclude>
+							</excludes>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>repackage</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>3.5.0</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+								<configuration>
+									<minimizeJar>false</minimizeJar>
+									<filters>
+										<filter>
+											<artifact>*:*</artifact>
+											<excludes>
+												<exclude>META-INF/*.SF</exclude>
+												<exclude>META-INF/*.DSA</exclude>
+												<exclude>META-INF/*.RSA</exclude>
+												<exclude>META-INF/MANIFEST.MF</exclude>
+											</excludes>
+										</filter>
+									</filters>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

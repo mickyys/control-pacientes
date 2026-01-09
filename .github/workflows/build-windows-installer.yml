@@ -24,8 +24,11 @@ jobs:
           distribution: 'temurin'
           cache: maven
       
-      - name: Build application with Maven
+      - name: Build application with Maven - Development
         run: mvn clean package -DskipTests
+      
+      - name: Build application with Maven - Production JAR
+        run: mvn clean package -Pprod -DskipTests
       
       - name: Install WiX Toolset
         run: |
@@ -119,32 +122,59 @@ jobs:
       
       - name: List generated files
         run: |
-          Write-Host "Searching for MSI files in target directory..."
+          Write-Host "Searching for MSI files and JARs in target directory..."
           $msiFiles = Get-ChildItem -Path target -Include *.msi -ErrorAction SilentlyContinue
+          $jarFiles = Get-ChildItem -Path target -Include *.jar -ErrorAction SilentlyContinue
+          
           if ($msiFiles) {
             Write-Host "Found MSI files:"
             $msiFiles | ForEach-Object { Write-Host "  - $($_.FullName) ($('{0:N2}' -f ($_.Length / 1MB)) MB)" }
           } else {
             Write-Host "No MSI files found in target directory"
-            Write-Host "Target directory contents:"
-            Get-ChildItem -Path target | ForEach-Object { Write-Host "  - $($_.Name)" }
           }
+          
+          if ($jarFiles) {
+            Write-Host "Found JAR files:"
+            $jarFiles | ForEach-Object { Write-Host "  - $($_.FullName) ($('{0:N2}' -f ($_.Length / 1MB)) MB)" }
+          }
+          
+          Write-Host "Target directory contents:"
+          Get-ChildItem -Path target | ForEach-Object { Write-Host "  - $($_.Name)" }
         shell: powershell
         continue-on-error: true
       
       - name: Upload Windows Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: control-pacientes-windows-installer
-          path: target/*.msi
+          name: control-pacientes-windows
+          path: |
+            target/*.msi
+            target/control-pacientes.jar
+            target/control-pacientes-java-1.0.0.jar
           retention-days: 30
       
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v1
         with:
-          files: target/*.msi
+          files: |
+            target/*.msi
+            target/control-pacientes.jar
+            target/control-pacientes-java-1.0.0.jar
           draft: false
           prerelease: false
+          body: |
+            ## Control Pacientes Release
+            
+            ### Windows Installer
+            - **ControlPacientes-*.msi** - Instalador MSI para Windows
+            
+            ### JAR Files (Ejecutables multiplataforma)
+            - **control-pacientes.jar** - Versión productiva optimizada (205 MB)
+            - **control-pacientes-java-1.0.0.jar** - Versión de desarrollo (1.4 MB)
+            
+            ### Requisitos
+            - Java 19 o superior instalado
+            - Para ejecutar JARs: `java -jar control-pacientes.jar`
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
