@@ -29,13 +29,13 @@
     </MenuBar>   
 
     <!-- Main Content Area - 2 Columns Layout -->
-    <HBox VBox.vgrow="ALWAYS" spacing="15.0" styleClass="content-area">
+    <HBox fx:id="mainContentHBox" VBox.vgrow="ALWAYS" spacing="15.0" styleClass="content-area">
         <padding>
             <Insets top="15.0" left="15.0" right="15.0" bottom="15.0"/>
         </padding>
 
         <!-- LEFT COLUMN: Patient Information, Medical Records and Medications -->
-        <VBox spacing="15.0" HBox.hgrow="ALWAYS" prefWidth="750.0">
+        <VBox fx:id="leftColumn" spacing="15.0" HBox.hgrow="ALWAYS" prefWidth="750.0">
 
             <!-- PATIENT INFORMATION PANEL - 2 COLUMNS -->
             <VBox styleClass="panel-compact" spacing="8.0">
@@ -49,7 +49,7 @@
                           <Button text="+ Nuevo Paciente" fx:id="btnNewPaciente" onAction="#handleNewPaciente" styleClass="btn-sm-primary"/>
                  </HBox>
 
-                <HBox spacing="5.0">
+                <HBox spacing="5.0" fx:id="pacienteColumnsContainer">
                     <!-- Column 1 -->
                     <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                         <Label text="RUT" styleClass="field-label"/>
@@ -57,15 +57,18 @@
 
                         <Label text="Nombre" styleClass="field-label"/>
                         <TextField fx:id="tfPacienteNombre" promptText="Nombre completo" styleClass="input-field" disable="true"/>
+                    </VBox>
 
+                    <!-- Column 2 -->
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                         <Label text="Apellido" styleClass="field-label"/>
                         <TextField fx:id="tfPacienteApellido" promptText="Apellido" styleClass="input-field" disable="true"/>
 
                         <Label text="Email" styleClass="field-label"/>
-                        <TextField fx:id="tfPacienteEmail" promptText="correo@ejemplo.com" styleClass="input-field" disable="true"/>                                                
+                        <TextField fx:id="tfPacienteEmail" promptText="correo@ejemplo.com" styleClass="input-field" disable="true"/>
                     </VBox>
 
-                    <!-- Column 2 -->
+                    <!-- Column 3 -->
                     <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                         <Label text="Teléfono" styleClass="field-label"/>
                         <TextField fx:id="tfPacienteTelefono" promptText="+56 9 9999 9999" styleClass="input-field" disable="true"/>
@@ -75,8 +78,6 @@
 
                         <Label text="Dirección" styleClass="field-label"/>
                         <TextField fx:id="tfPacienteDireccion" promptText="Dirección completa" styleClass="input-field" disable="true"/>
-                        
-                   
                     </VBox>
                 </HBox>
             </VBox>
@@ -126,7 +127,7 @@
         </VBox>
 
         <!-- RIGHT COLUMN: Search and Patient List -->
-        <VBox spacing="15.0" HBox.hgrow="ALWAYS" prefWidth="400.0">
+        <VBox fx:id="rightColumn" spacing="15.0" HBox.hgrow="ALWAYS" prefWidth="400.0">
             <!-- SEARCH PANEL -->
             <VBox styleClass="panel" spacing="10.0">
                 <padding>
@@ -134,17 +135,20 @@
                 </padding>
                 <Label text="Buscador de Pacientes" styleClass="panel-title"/>
 
-                <HBox spacing="15.0">
+                <HBox spacing="15.0" fx:id="searchColumnsContainer">
                     <!-- Column 1 -->
                     <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                         <Label text="RUT" styleClass="field-label"/>
                         <TextField fx:id="tfBuscaRut" promptText="Buscar por RUT..." styleClass="input-field"/>
+                    </VBox>
 
+                    <!-- Column 2 -->
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                         <Label text="Nombre" styleClass="field-label"/>
                         <TextField fx:id="tfBuscaNombre" promptText="Buscar por nombre..." styleClass="input-field"/>
                     </VBox>
 
-                    <!-- Column 2 -->
+                    <!-- Column 3 -->
                     <VBox spacing="8.0" HBox.hgrow="ALWAYS">
                         <Label text="Ciudad" styleClass="field-label"/>
                         <TextField fx:id="tfBuscaCiudad" promptText="Buscar por ciudad..." styleClass="input-field"/>

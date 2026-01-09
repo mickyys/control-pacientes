@@ -8,6 +8,8 @@ import com.controlpacientes.service.FichaMedicaService;
 import com.controlpacientes.service.MedicamentoAtencionService;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Orientation;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
@@ -48,6 +50,13 @@ public class MainController {
     @FXML private Button btnPacienteEditar;
     @FXML private Button btnPacienteEliminar;
 
+    // Responsive Layout Controls
+    @FXML private HBox mainContentHBox;
+    @FXML private VBox leftColumn;
+    @FXML private VBox rightColumn;
+    @FXML private HBox pacienteColumnsContainer;
+    @FXML private HBox searchColumnsContainer;
+
     // Medical Records Controls (Left Column - Bottom)
     @FXML private ComboBox<String> cbFichaFechas;
     @FXML private TextArea taMotivoconsulta;
@@ -83,6 +92,7 @@ public class MainController {
     public void initialize() {
         setupTableColumns();
         setupListeners();
+        setupResponsiveLayout();
         cargarPacientes();
         limpiarFormularioPaciente();
         crearCamposMedicamentos();
@@ -796,6 +806,54 @@ public class MainController {
         }
     }
 
+    // ==================== RESPONSIVE LAYOUT METHODS ====================
+    
+    private void setupResponsiveLayout() {
+        // Esperar a que la escena esté disponible
+        if (mainContentHBox.getScene() != null) {
+            attachWindowResizeListener();
+        } else {
+            mainContentHBox.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) {
+                    attachWindowResizeListener();
+                }
+            });
+        }
+    }
+
+    private void attachWindowResizeListener() {
+        Stage stage = (Stage) mainContentHBox.getScene().getWindow();
+        
+        // Listener para cambios de ancho
+        stage.widthProperty().addListener((obs, oldVal, newVal) -> 
+            updateResponsiveLayout(newVal.doubleValue(), stage.getHeight())
+        );
+        
+        // Listener para cambios de alto
+        stage.heightProperty().addListener((obs, oldVal, newVal) -> 
+            updateResponsiveLayout(stage.getWidth(), newVal.doubleValue())
+        );
+        
+        // Aplicar layout inicial
+        updateResponsiveLayout(stage.getWidth(), stage.getHeight());
+    }
+
+    private void updateResponsiveLayout(double width, double height) {
+        boolean isSmallScreen = width < 1920 || height < 1200;
+        
+        if (isSmallScreen) {
+            // Para pantallas pequeñas: cambiar a layout apilado
+            mainContentHBox.setOrientation(Orientation.VERTICAL);
+            leftColumn.setPrefWidth(Double.MAX_VALUE);
+            rightColumn.setPrefWidth(Double.MAX_VALUE);
+        } else {
+            // Para pantallas grandes: mantener layout horizontal
+            mainContentHBox.setOrientation(Orientation.HORIZONTAL);
+            leftColumn.setPrefWidth(750.0);
+            rightColumn.setPrefWidth(400.0);
+        }
+    }
+}
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
         Alert alert = new Alert(tipo);
         alert.setTitle(titulo);
