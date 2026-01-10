@@ -27,40 +27,8 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-		<!-- JavaFX for Windows, Mac, and Linux -->
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-controls</artifactId>
-			<version>${javafx.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-controls</artifactId>
-			<version>${javafx.version}</version>
-			<classifier>win</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-fxml</artifactId>
-			<version>${javafx.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-fxml</artifactId>
-			<version>${javafx.version}</version>
-			<classifier>win</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-graphics</artifactId>
-			<version>${javafx.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-graphics</artifactId>
-			<version>${javafx.version}</version>
-			<classifier>win</classifier>
-		</dependency>
+		<!-- JavaFX - Platform specific versions in profiles -->
+		<!-- Placeholder - dependencies defined per platform in profiles -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -130,8 +98,94 @@
 		</plugins>
 	</build>
 
-	<!-- Production Profile -->
+	<!-- Profiles -->
 	<profiles>
+		<!-- macOS Profile -->
+		<profile>
+			<id>macos</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-controls</artifactId>
+					<version>${javafx.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-fxml</artifactId>
+					<version>${javafx.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-graphics</artifactId>
+					<version>${javafx.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+
+		<!-- Windows Profile -->
+		<profile>
+			<id>windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-controls</artifactId>
+					<version>${javafx.version}</version>
+					<classifier>win</classifier>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-fxml</artifactId>
+					<version>${javafx.version}</version>
+					<classifier>win</classifier>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-graphics</artifactId>
+					<version>${javafx.version}</version>
+					<classifier>win</classifier>
+				</dependency>
+			</dependencies>
+		</profile>
+
+		<!-- Linux Profile -->
+		<profile>
+			<id>linux</id>
+			<activation>
+				<os>
+					<family>unix</family>
+					<name>!mac</name>
+				</os>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-controls</artifactId>
+					<version>${javafx.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-fxml</artifactId>
+					<version>${javafx.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>org.openjfx</groupId>
+					<artifactId>javafx-graphics</artifactId>
+					<version>${javafx.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+
+		<!-- Production Profile -->
 		<profile>
 			<id>prod</id>
 			<properties>
@@ -171,7 +225,7 @@
 									<goal>shade</goal>
 								</goals>
 								<configuration>
-									<minimizeJar>false</minimizeJar>
+									<minimizeJar>true</minimizeJar>
 									<filters>
 										<filter>
 											<artifact>*:*</artifact>

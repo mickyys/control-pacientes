@@ -10,8 +10,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-jars:
+  build-windows-jar:
     runs-on: ubuntu-latest
+    name: Build Windows JAR
     
     steps:
       - name: Checkout code
@@ -24,87 +25,164 @@ jobs:
           distribution: 'temurin'
           cache: maven
       
-      - name: Build Development JAR
-        run: mvn clean package -DskipTests
+      - name: Build Windows JAR
+        run: mvn clean package -Pwindows,prod -DskipTests -Drevision=windows
       
-      - name: Build Production JAR
-        run: mvn package -Pprod -DskipTests
-      
-      - name: Verify JAR files
+      - name: Rename JAR for Windows
         run: |
-          echo "=== JAR Files Generated ==="
-          ls -lh target/*.jar
-          echo ""
-          echo "=== JAR Integrity Check ==="
-          file target/*.jar
-          echo ""
-          echo "=== JAR Contents Sample ==="
-          jar tf target/control-pacientes.jar | head -20
+          if [ -f "target/control-pacientes.jar" ]; then
+            mv target/control-pacientes.jar target/control-pacientes-windows.jar
+          fi
       
-      - name: Upload JAR Artifacts
+      - name: Upload Windows JAR Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: control-pacientes-jars
-          path: |
-            target/control-pacientes.jar
-            target/control-pacientes-java-1.0.0.jar
+          name: control-pacientes-windows-jar
+          path: target/control-pacientes-windows.jar
           retention-days: 30
+
+  build-linux-jar:
+    runs-on: ubuntu-latest
+    name: Build Linux JAR
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK 19
+        uses: actions/setup-java@v4
+        with:
+          java-version: '19'
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: Build Linux JAR
+        run: mvn clean package -Plinux,prod -DskipTests -Drevision=linux
+      
+      - name: Rename JAR for Linux
+        run: |
+          if [ -f "target/control-pacientes.jar" ]; then
+            mv target/control-pacientes.jar target/control-pacientes-linux.jar
+          fi
+      
+      - name: Upload Linux JAR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: control-pacientes-linux-jar
+          path: target/control-pacientes-linux.jar
+          retention-days: 30
+
+  build-macos-jar:
+    runs-on: macos-latest
+    name: Build macOS JAR
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK 19
+        uses: actions/setup-java@v4
+        with:
+          java-version: '19'
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: Build macOS JAR
+        run: mvn clean package -Pmacos,prod -DskipTests -Drevision=macos
+      
+      - name: Rename JAR for macOS
+        run: |
+          if [ -f "target/control-pacientes.jar" ]; then
+            mv target/control-pacientes.jar target/control-pacientes-macos.jar
+          fi
+      
+      - name: Upload macOS JAR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: control-pacientes-macos-jar
+          path: target/control-pacientes-macos.jar
+          retention-days: 30
+
+  create-release:
+    needs: [build-windows-jar, build-linux-jar, build-macos-jar]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+      
+      - name: Prepare release files
+        run: |
+          mkdir -p release
+          cp artifacts/control-pacientes-windows-jar/*.jar release/ || true
+          cp artifacts/control-pacientes-linux-jar/*.jar release/ || true
+          cp artifacts/control-pacientes-macos-jar/*.jar release/ || true
+          ls -lh release/
       
       - name: Create Release with JARs
-        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            target/control-pacientes.jar
-            target/control-pacientes-java-1.0.0.jar
+            release/control-pacientes-windows.jar
+            release/control-pacientes-linux.jar
+            release/control-pacientes-macos.jar
           draft: false
           prerelease: false
           body: |
-            ## Control Pacientes JAR Release
+            ## Control Pacientes - Optimized JAR Release
+            
+            Each JAR is optimized for its specific platform with minimal dependencies.
             
             ### Available JARs
             
-            #### Production JAR (Recommended)
-            **`control-pacientes.jar`** (205 MB)
-            - Fully optimized for production
-            - Minimal logging (WARN level)
-            - Database validation mode (no auto-creation)
-            - G1 Garbage Collector tuning
+            #### Windows JAR
+            **`control-pacientes-windows.jar`**
+            - Optimized for Windows 10+
+            - Includes Windows-specific JavaFX libraries
+            - Minimized dependencies
             
-            ##### Run in Production (macOS/Linux)
-            ```bash
-            java -server -XX:+UseG1GC -Xms1g -Xmx2g -jar control-pacientes.jar
-            ```
-            
-            ##### Run in Production (Windows)
+            ##### Run on Windows
             ```cmd
-            java -server -XX:+UseG1GC -Xms1g -Xmx2g -jar control-pacientes.jar
+            java -server -XX:+UseG1GC -Xms1g -Xmx2g -jar control-pacientes-windows.jar
             ```
             
-            #### Development JAR
-            **`control-pacientes-java-1.0.0.jar`** (1.4 MB)
-            - Lightweight for testing and development
-            - Full debug logging available
-            - Smaller size for quick transfers
+            #### Linux JAR
+            **`control-pacientes-linux.jar`**
+            - Optimized for Linux
+            - Includes Linux-specific JavaFX libraries
+            - Minimized dependencies
             
-            ##### Run Development
+            ##### Run on Linux
             ```bash
-            java -jar control-pacientes-java-1.0.0.jar --spring.profiles.active=dev
+            java -server -XX:+UseG1GC -Xms1g -Xmx2g -jar control-pacientes-linux.jar
+            ```
+            
+            #### macOS JAR
+            **`control-pacientes-macos.jar`**
+            - Optimized for macOS 10.14+
+            - Includes macOS-specific JavaFX libraries
+            - Minimized dependencies
+            
+            ##### Run on macOS
+            ```bash
+            java -server -XX:+UseG1GC -Xms1g -Xmx2g -jar control-pacientes-macos.jar
             ```
             
             ### System Requirements
             - **Java 19+** (required)
             - **RAM**: 2+ GB recommended
             - **Storage**: 500 MB free space
-            - **Supported OS**: Windows 10+, macOS 10.14+, Linux
             
             ### Quick Start
-            1. Ensure Java 19+ is installed
-            2. Download JAR file
-            3. Run: `java -jar control-pacientes.jar`
+            1. Download the JAR file for your operating system
+            2. Ensure Java 19+ is installed
+            3. Run the command for your OS (see above)
             4. Application will create/use SQLite database in working directory
-            
-            ### Documentation
-            For detailed setup and troubleshooting, see JAR_PRODUCTIVO.md in the repository.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
