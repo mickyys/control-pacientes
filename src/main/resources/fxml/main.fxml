@@ -15,7 +15,7 @@
 
     <!-- Menu Bar -->
     <MenuBar>
-        <menus>
+        <menus>            
             <Menu text="Herramientas">
                 <items>
                     <MenuItem text="Exportar a Excel" onAction="#handleExportarExcel"/>
@@ -23,6 +23,11 @@
                     <MenuItem text="Acerca de" onAction="#handleAbout"/>
                     <SeparatorMenuItem/>
                     <MenuItem text="Salir" onAction="#handleExit"/>
+                </items>
+            </Menu>
+            <Menu text="Administración">
+                <items>
+                    <MenuItem text="Administrar Usuarios" onAction="#handleAdministrarUsuarios"/>
                 </items>
             </Menu>
         </menus>

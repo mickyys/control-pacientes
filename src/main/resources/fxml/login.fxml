@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.controlpacientes.ui.controller.LoginController"
+      prefHeight="600.0" prefWidth="800.0"
+      alignment="CENTER" spacing="20"
+      styleClass="login-container">
+
+    <!-- Main Content Pane -->
+    <VBox alignment="CENTER" spacing="30" styleClass="login-panel">
+        <padding>
+            <Insets top="40" bottom="40" left="40" right="40"/>
+        </padding>
+
+        <!-- Title -->
+        <VBox alignment="CENTER" spacing="10">
+            <Label text="Control de Pacientes" styleClass="login-title"/>
+            <Label text="Sistema de Gestión Médica" styleClass="login-subtitle"/>
+        </VBox>
+
+        <!-- Login Form -->
+        <VBox spacing="15" prefWidth="400">
+            <!-- RUT Field -->
+            <VBox spacing="8">
+                <Label text="RUT:" styleClass="login-label"/>
+                <TextField fx:id="tfRut"
+                           promptText="Ej: 12345678-9"
+                           styleClass="login-input"
+                           onAction="#handleLogin"/>
+            </VBox>
+
+            <!-- Clave Field -->
+            <VBox spacing="8">
+                <Label text="Clave:" styleClass="login-label"/>
+                <PasswordField fx:id="pfClave"
+                               promptText="Ingrese su clave"
+                               styleClass="login-input"
+                               onAction="#handleLogin"/>
+            </VBox>
+
+            <!-- Error Message -->
+            <Label fx:id="lblError" styleClass="login-error" wrapText="true"/>
+
+            <!-- Login Button -->
+            <Button text="Iniciar Sesión"
+                    fx:id="btnLogin"
+                    onAction="#handleLogin"
+                    styleClass="login-button"
+                    prefHeight="45"
+                    prefWidth="400"/>
+        </VBox>
+
+        <!-- Demo Credentials Info -->
+        <VBox spacing="8" styleClass="login-info">
+            <Label text="Credenciales de demostración:" styleClass="login-info-title"/>
+            <Label text="RUT: 12345678-9  |  Clave: admin" styleClass="login-info-text"/>
+            <Label text="RUT: 87654321-0  |  Clave: doctor" styleClass="login-info-text"/>
+        </VBox>
+    </VBox>
+</VBox>

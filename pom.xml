@@ -22,6 +22,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+		<!-- Spring Security para encriptación de contraseñas -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
 		<!-- JavaFX for Windows, Mac, and Linux -->
 		<dependency>
 			<groupId>org.openjfx</groupId>
@@ -179,6 +184,43 @@
 										</filter>
 									</filters>
 								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- Plugin para crear ejecutable con jpackage (solo en prod) -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>3.1.0</version>
+						<executions>
+							<execution>
+								<id>jpackage</id>
+								<phase>package</phase>
+								<configuration>
+									<target>
+										<exec executable="jpackage" failonerror="false">
+											<arg value="--input"/>
+											<arg value="${project.build.directory}"/>
+											<arg value="--name"/>
+											<arg value="Control Pacientes"/>
+											<arg value="--main-jar"/>
+											<arg value="control-pacientes.jar"/>
+											<arg value="--main-class"/>
+											<arg value="com.controlpacientes.ControlPacientesApplication"/>
+											<arg value="--type"/>
+											<arg value="app-image"/>
+											<arg value="--dest"/>
+											<arg value="${project.build.directory}/dist"/>
+											<arg value="--icon"/>
+											<arg value="src/main/resources/images/icono.icns"/>
+											<arg value="--app-version"/>
+											<arg value="${project.version}"/>
+										</exec>
+									</target>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
 							</execution>
 						</executions>
 					</plugin>

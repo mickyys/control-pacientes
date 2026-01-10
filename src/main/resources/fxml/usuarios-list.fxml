@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.controlpacientes.ui.controller.UsuariosListController"
+      prefHeight="600.0" prefWidth="800.0"
+      spacing="10.0" styleClass="root-container">
+
+    <padding>
+        <Insets top="15.0" left="15.0" right="15.0" bottom="15.0"/>
+    </padding>
+
+    <!-- Header con título y botones -->
+    <HBox spacing="10.0" alignment="CENTER_LEFT">
+        <Label text="Administración de Usuarios" styleClass="panel-title" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnNuevoUsuario" text="+ Nuevo Usuario" onAction="#handleNuevoUsuario" styleClass="btn-primary"/>
+        <Button fx:id="btnActualizar" text="Actualizar" onAction="#handleActualizar" styleClass="btn-secondary"/>
+    </HBox>
+
+    <!-- Panel de búsqueda -->
+    <HBox spacing="10.0" styleClass="panel-compact">
+        <padding>
+            <Insets top="8.0" bottom="8.0" left="8.0" right="8.0"/>
+        </padding>
+        <Label text="Buscar:" style="-fx-font-weight: bold;"/>
+        <TextField fx:id="tfBuscar" promptText="Por RUT o Nombre" HBox.hgrow="ALWAYS"/>
+        <Label fx:id="lblTotalUsuarios" text="Total: 0 usuarios"/>
+    </HBox>
+
+    <!-- Tabla de usuarios -->
+    <TableView fx:id="tvUsuarios" VBox.vgrow="ALWAYS" style="-fx-font-size: 11px;">
+        <columns>
+            <TableColumn fx:id="tcId" text="ID" prefWidth="50.0" sortable="false"/>
+            <TableColumn fx:id="tcRut" text="RUT" prefWidth="100.0" sortable="true"/>
+            <TableColumn fx:id="tcNombre" text="Nombre" prefWidth="150.0" sortable="true"/>
+            <TableColumn fx:id="tcRol" text="Rol" prefWidth="100.0" sortable="true"/>
+            <TableColumn fx:id="tcActivo" text="Estado" prefWidth="70.0" sortable="true"/>
+            <TableColumn fx:id="tcFechaCreacion" text="Fecha Creación" prefWidth="120.0" sortable="true"/>
+            <TableColumn fx:id="tcAcciones" text="Acciones" prefWidth="200.0" sortable="false"/>
+        </columns>
+    </TableView>
+
+</VBox>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.controlpacientes.ui.controller.UsuarioFormController"
+      prefHeight="400.0" prefWidth="500.0"
+      spacing="10.0" styleClass="root-container">
+
+    <padding>
+        <Insets top="20.0" left="20.0" right="20.0" bottom="20.0"/>
+    </padding>
+
+    <!-- Formulario -->
+    <GridPane hgap="10.0" vgap="10.0">
+        <columnConstraints>
+            <ColumnConstraints prefWidth="100.0" minWidth="100.0"/>
+            <ColumnConstraints prefWidth="1.0" hgrow="ALWAYS"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints prefHeight="35.0"/>
+            <RowConstraints prefHeight="35.0"/>
+            <RowConstraints prefHeight="35.0"/>
+            <RowConstraints prefHeight="80.0"/>
+            <RowConstraints prefHeight="35.0"/>
+        </rowConstraints>
+
+        <!-- RUT -->
+        <Label text="RUT *" style="-fx-font-weight: bold;" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <TextField fx:id="tfRut" promptText="ej: 12345678-9" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+        <!-- Nombre -->
+        <Label text="Nombre *" style="-fx-font-weight: bold;" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <TextField fx:id="tfNombre" promptText="Nombre completo del usuario" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+        <!-- Rol -->
+        <Label text="Rol *" style="-fx-font-weight: bold;" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <ComboBox fx:id="cbRol" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+        <!-- Contraseña -->
+        <Label fx:id="lblClaveLabel" text="Contraseña *" style="-fx-font-weight: bold;" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+        <VBox fx:id="hboxClave" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+            <PasswordField fx:id="pfClave" promptText="Contraseña"/>
+            <PasswordField fx:id="pfConfirmarClave" promptText="Confirmar contraseña"/>
+        </VBox>
+
+        <!-- Activo -->
+        <Label text="Estado" style="-fx-font-weight: bold;" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+        <CheckBox fx:id="cbActivo" text="Activo" selected="true" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+    </GridPane>
+
+    <!-- Botones -->
+    <Region VBox.vgrow="ALWAYS"/>
+    <HBox spacing="10.0" alignment="CENTER_RIGHT">
+        <Button fx:id="btnGuardar" text="Guardar" styleClass="btn-primary" prefWidth="100.0"/>
+        <Button fx:id="btnCancelar" text="Cancelar" styleClass="btn-secondary" prefWidth="100.0"/>
+    </HBox>
+
+</VBox>

@@ -6,24 +6,30 @@ import com.controlpacientes.model.MedicamentoAtencion;
 import com.controlpacientes.service.PacienteService;
 import com.controlpacientes.service.FichaMedicaService;
 import com.controlpacientes.service.MedicamentoAtencionService;
+import com.controlpacientes.service.UsuarioActualService;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Orientation;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,6 +42,8 @@ public class MainController {
     private final PacienteService pacienteService;
     private final FichaMedicaService fichaMedicaService;
     private final MedicamentoAtencionService medicamentoService;
+    private final UsuarioActualService usuarioActualService;
+    private final ApplicationContext applicationContext;
 
     // Paciente Information Controls (Left Column - Top)
     @FXML private TextField tfPacienteRut;
@@ -143,7 +151,7 @@ public class MainController {
         String rutLimpio = rut.replaceAll("[^0-9Kk]", "");
         
         if (rutLimpio.length() < 2) {
-            return rut;
+            return rutLimpio;
         }
         
         // Formato: XX.XXX.XXX-X (ej: 12.345.678-9)
@@ -152,14 +160,12 @@ public class MainController {
         
         // Agregar puntos cada 3 dígitos de derecha a izquierda
         StringBuilder rutFormateado = new StringBuilder();
-        int contador = 0;
-        for (int i = digitos.length() - 1; i >= 0; i--) {
-            if (contador == 3) {
-                rutFormateado.insert(0, ".");
-                contador = 0;
+        int len = digitos.length();
+        for (int i = 0; i < len; i++) {
+            if (i > 0 && (len - i) % 3 == 0) {
+                rutFormateado.append(".");
             }
-            rutFormateado.insert(0, digitos.charAt(i));
-            contador++;
+            rutFormateado.append(digitos.charAt(i));
         }
         
         return rutFormateado.toString() + "-" + verificador;
@@ -202,6 +208,23 @@ public class MainController {
                 }
             }
         });
+
+        // Formatear RUT en los campos de entrada
+        setupRutFormatter(tfPacienteRut);
+        setupRutFormatter(tfBuscaRut);
+    }
+
+    private void setupRutFormatter(TextField rutField) {
+        // Formatear cuando pierde el foco
+        rutField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue && !rutField.getText().isEmpty()) {
+                String rutLimpio = rutField.getText().replaceAll("[^0-9Kk]", "");
+                if (!rutLimpio.isEmpty()) {
+                    String rutFormateado = formatearRut(rutLimpio);
+                    rutField.setText(rutFormateado);
+                }
+            }
+        });
     }
 
     private void setupTabNavigation() {
@@ -228,21 +251,22 @@ public class MainController {
         // Ordenar alfabéticamente por nombre
         pacientes.sort(Comparator.comparing(p -> p.getNombre() != null ? p.getNombre() : ""));
         tvPacientes.getItems().setAll(pacientes);
+        lblResultados.setText(String.valueOf(pacientes.size()));
         log.info("Tabla de pacientes actualizada con {} registros", pacientes.size());
     }
 
     @FXML
     private void handleBuscar() {
-        String rut = tfBuscaRut.getText().trim();
-        String nombre = tfBuscaNombre.getText().trim();
+        String rut = tfBuscaRut.getText().trim().replaceAll("[^0-9Kk]", "");
+        String nombre = tfBuscaNombre.getText().trim().toLowerCase();
         String ciudad = tfBuscaCiudad.getText().trim();
         String ano = tfBuscaAno.getText().trim();
 
         List<Paciente> resultados = pacienteService.findAll().stream()
                 .filter(p -> rut.isEmpty() || p.getRut().contains(rut))
                 .filter(p -> nombre.isEmpty() || 
-                    p.getNombre().toLowerCase().contains(nombre.toLowerCase()) ||
-                    (p.getApellido() != null && p.getApellido().toLowerCase().contains(nombre.toLowerCase())))
+                    (p.getNombre() != null && p.getNombre().toLowerCase().contains(nombre)) ||
+                    (p.getApellido() != null && p.getApellido().toLowerCase().contains(nombre)))
                 .filter(p -> ciudad.isEmpty() || (p.getCiudad() != null && p.getCiudad().toLowerCase().contains(ciudad.toLowerCase())))
                 .filter(p -> ano.isEmpty() || verificarAnoUltimaVisita(p, ano))
                 .sorted(Comparator.comparing(p -> p.getNombre() != null ? p.getNombre() : ""))
@@ -279,7 +303,6 @@ public class MainController {
         tfBuscaCiudad.clear();
         tfBuscaAno.clear();
         cargarPacientes();
-        lblResultados.setText("0");
     }
 
     @FXML
@@ -795,6 +818,38 @@ public class MainController {
                 "Interfaz centralizada\n\n" +
                 "Gestión eficiente de pacientes y fichas médicas.");
         alert.showAndWait();
+    }
+
+    @FXML
+    public void handleAdministrarUsuarios() {
+        // Verificar que el usuario sea administrador
+        if (!usuarioActualService.isAdministrador()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Acceso Denegado");
+            alert.setContentText("Solo los administradores pueden gestionar usuarios.");
+            alert.showAndWait();
+            return;
+        }
+        
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/usuarios-list.fxml"));
+            loader.setControllerFactory(applicationContext::getBean);
+            Parent root = loader.load();
+            
+            Stage stage = new Stage();
+            stage.setTitle("Administración de Usuarios");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setWidth(900);
+            stage.setHeight(650);
+            stage.showAndWait();
+        } catch (IOException e) {
+            log.error("Error al abrir administración de usuarios", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setContentText("No se pudo abrir la administración de usuarios: " + e.getMessage());
+            alert.showAndWait();
+        }
     }
 
     @FXML

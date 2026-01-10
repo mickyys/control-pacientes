@@ -31,14 +31,15 @@ public class JavaFXApplication extends Application {
         var uiNavigator = springContext.getBean(com.controlpacientes.ui.UINavigator.class);
         uiNavigator.setMainStage(primaryStage);
         
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
+        // Cargar pantalla de login
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
         loader.setControllerFactory(springContext::getBean);
         Parent root = loader.load();
 
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
 
-        primaryStage.setTitle("Control de Pacientes");
+        primaryStage.setTitle("Control de Pacientes - Login");
         // Configurar icono de la aplicación
         try {
             Image iconImage = new Image(getClass().getResource("/images/icono.png").toExternalForm());
@@ -48,7 +49,9 @@ public class JavaFXApplication extends Application {
         }
         
         primaryStage.setScene(scene);
-        primaryStage.setMaximized(true);
+        primaryStage.setWidth(800);
+        primaryStage.setHeight(600);
+        primaryStage.centerOnScreen();
         primaryStage.show();
         
         // Iniciar Hot Reload en modo desarrollo

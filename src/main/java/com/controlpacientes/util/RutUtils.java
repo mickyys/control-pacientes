@@ -26,6 +26,16 @@ public class RutUtils {
         return (s != 0) ? String.valueOf(s - 1) : "K";
     }
 
+    public static String normalizeRut(String rut) {
+        if (rut == null || rut.isEmpty()) return "";
+        return rut.replace(".", "").replace("-", "").toUpperCase();
+    }
+
+    public static String capitalize(String text) {
+        if (text == null || text.isEmpty()) return "";
+        return text.trim().substring(0, 1).toUpperCase() + text.trim().substring(1).toLowerCase();
+    }
+
     public static String formatRut(String rut) {
         if (rut == null || rut.isEmpty()) return "";
         rut = rut.replace(".", "").replace("-", "").toUpperCase();

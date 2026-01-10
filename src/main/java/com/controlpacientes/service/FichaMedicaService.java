@@ -3,6 +3,7 @@ package com.controlpacientes.service;
 import com.controlpacientes.model.FichaMedica;
 import com.controlpacientes.repository.FichaMedicaRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FichaMedicaService {
 
     private final FichaMedicaRepository fichaMedicaRepository;
@@ -66,11 +68,17 @@ public class FichaMedicaService {
         if (fichaMedica.getMedicamentos() != null) {
             fichaMedica.getMedicamentos().forEach(m -> m.setFichaMedica(fichaMedica));
         }
-        return fichaMedicaRepository.save(fichaMedica);
+        FichaMedica saved = fichaMedicaRepository.save(fichaMedica);
+        log.info("FICHA_CREADA - ID: {}, Paciente: {}, Fecha: {}", 
+            saved.getId(), 
+            saved.getPaciente().getNombre() + " " + saved.getPaciente().getApellido(), 
+            saved.getFechaAtencion());
+        return saved;
     }
 
     @Transactional
     public void delete(Long id) {
         fichaMedicaRepository.deleteById(id);
+        log.info("FICHA_ELIMINADA - ID: {}", id);
     }
 }
