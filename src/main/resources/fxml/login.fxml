@@ -54,13 +54,6 @@
                     styleClass="login-button"
                     prefHeight="45"
                     prefWidth="400"/>
-        </VBox>
-
-        <!-- Demo Credentials Info -->
-        <VBox spacing="8" styleClass="login-info">
-            <Label text="Credenciales de demostración:" styleClass="login-info-title"/>
-            <Label text="RUT: 12345678-9  |  Clave: admin" styleClass="login-info-text"/>
-            <Label text="RUT: 87654321-0  |  Clave: doctor" styleClass="login-info-text"/>
-        </VBox>
+        </VBox>       
     </VBox>
 </VBox>

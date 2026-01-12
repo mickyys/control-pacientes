@@ -7,6 +7,7 @@ echo "========================================="
 echo "Control Pacientes - Modo Desarrollo"
 echo "========================================="
 echo ""
+echo "Tema: Verde Esmeralda 🌿"
 echo "Hot Reload está habilitado para:"
 echo "  • FXML: src/main/resources/fxml/"
 echo "  • CSS: src/main/resources/css/"
@@ -18,4 +19,8 @@ echo "Presiona Ctrl+C para detener."
 echo "========================================="
 echo ""
 
-mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=dev"
+# Compilar primero con los perfiles para que se procesen correctamente
+mvn clean compile -Pwindows,emerald -q
+
+# Luego ejecutar con spring-boot:run
+mvn -Pwindows,emerald spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=dev"

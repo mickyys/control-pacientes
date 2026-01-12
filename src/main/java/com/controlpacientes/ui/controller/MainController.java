@@ -127,7 +127,7 @@ public class MainController {
             private final Button btn = new Button("Eliminar");
 
             {
-                btn.setStyle("-fx-text-fill: black; -fx-padding: 5;");
+                btn.setStyle("-fx-text-fill: white; -fx-padding: 5;");
                 btn.setOnAction(event -> {
                     Paciente paciente = getTableView().getItems().get(getIndex());
                     mostrarConfirmacionEliminar(paciente);

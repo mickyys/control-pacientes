@@ -134,9 +134,11 @@ public class HotReloadService {
         currentScene.getStylesheets().clear();
         
         // Agregar nuevamente el stylesheet
-        String cssResource = getClass().getResource("/css/style.css").toExternalForm();
-        // Agregar timestamp para evitar caché
-        currentScene.getStylesheets().add(cssResource + "?t=" + System.currentTimeMillis());
+        String cssResource = loadStylesheet();
+        if (cssResource != null) {
+            // Agregar timestamp para evitar caché
+            currentScene.getStylesheets().add(cssResource + "?t=" + System.currentTimeMillis());
+        }
         
         log.info("CSS recargado exitosamente");
     }
@@ -210,5 +212,31 @@ public class HotReloadService {
         } catch (Exception e) {
             log.error("Error deteniendo HotReload: {}", e.getMessage());
         }
+    }
+
+    private String loadStylesheet() {
+        // Intentar cargar style.css primero (tema por defecto)
+        try {
+            var cssUrl = getClass().getResource("/css/style.css");
+            if (cssUrl != null) {
+                return cssUrl.toExternalForm();
+            }
+        } catch (Exception e) {
+            log.debug("No se encontró style.css: {}", e.getMessage());
+        }
+
+        // Si no existe standard, cargar style-emerald.css (tema esmeralda)
+        try {
+            var emeraldCssUrl = getClass().getResource("/css/style-emerald.css");
+            if (emeraldCssUrl != null) {
+                return emeraldCssUrl.toExternalForm();
+            }
+        } catch (Exception e) {
+            log.debug("No se encontró style-emerald.css: {}", e.getMessage());
+        }
+
+        // Si no se encuentra ninguno, mostrar warning pero continuar
+        log.warn("No se encontró ningún archivo CSS. Continuando sin estilos.");
+        return null;
     }
 }

@@ -198,12 +198,12 @@
                 </HBox>
                 <TableView fx:id="tvPacientes" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn text="RUT" prefWidth="90.0" fx:id="tcRut"/>
-                        <TableColumn text="Nombre" prefWidth="100.0" fx:id="tcNombre"/>
-                        <TableColumn text="Apellido" prefWidth="100.0" fx:id="tcApellido"/>
-                        <TableColumn text="Ciudad" prefWidth="90.0" fx:id="tcCiudad"/>
-                        <TableColumn text="Última Visita" prefWidth="120.0" fx:id="tcUltimaVisita"/>
-                        <TableColumn text="Eliminar" prefWidth="80.0" fx:id="tcEliminar"/>
+                        <TableColumn text="RUT" prefWidth="110.0" fx:id="tcRut"/>
+                        <TableColumn text="Nombre" prefWidth="140.0" fx:id="tcNombre"/>
+                        <TableColumn text="Apellido" prefWidth="140.0" fx:id="tcApellido"/>
+                        <TableColumn text="Ciudad" prefWidth="120.0" fx:id="tcCiudad"/>
+                        <TableColumn text="Última Visita" prefWidth="130.0" fx:id="tcUltimaVisita"/>
+                        <TableColumn text="Eliminar" prefWidth="90.0" fx:id="tcEliminar"/>
                     </columns>
                 </TableView>
             </VBox>

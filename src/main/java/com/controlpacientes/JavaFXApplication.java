@@ -37,7 +37,11 @@ public class JavaFXApplication extends Application {
         Parent root = loader.load();
 
         Scene scene = new Scene(root);
-        scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+        // Cargar CSS dinámicamente - intenta emerald primero, luego style.css
+        String cssResource = loadStylesheet();
+        if (cssResource != null) {
+            scene.getStylesheets().add(cssResource);
+        }
 
         primaryStage.setTitle("Control de Pacientes - Login");
         // Configurar icono de la aplicación
@@ -64,6 +68,34 @@ public class JavaFXApplication extends Application {
     private boolean isDevMode() {
         String profiles = System.getProperty("spring.profiles.active");
         return profiles == null || !profiles.contains("prod");
+    }
+
+    private String loadStylesheet() {
+        // Intentar cargar style.css primero (tema por defecto)
+        try {
+            var cssUrl = getClass().getResource("/css/style.css");
+            if (cssUrl != null) {
+                System.out.println("✓ Cargando tema estándar: style.css");
+                return cssUrl.toExternalForm();
+            }
+        } catch (Exception e) {
+            System.err.println("No se encontró style.css: " + e.getMessage());
+        }
+
+        // Si no existe standard, cargar style-emerald.css (tema esmeralda)
+        try {
+            var emeraldCssUrl = getClass().getResource("/css/style-emerald.css");
+            if (emeraldCssUrl != null) {
+                System.out.println("✓ Cargando tema esmeralda: style-emerald.css");
+                return emeraldCssUrl.toExternalForm();
+            }
+        } catch (Exception e) {
+            System.err.println("No se encontró style-emerald.css: " + e.getMessage());
+        }
+
+        // Si no se encuentra ninguno, mostrar error pero continuar
+        System.err.println("⚠ No se encontró ningún archivo CSS. Continuando sin estilos.");
+        return null;
     }
 
     @Override

@@ -74,10 +74,10 @@ public class UINavigator {
             }
             
             Scene scene = new Scene(root);
-            try {
-                scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-            } catch (Exception e) {
-                log.warn("No se pudo cargar el CSS: {}", e.getMessage());
+            // Cargar CSS dinámicamente - intenta emerald primero, luego style.css
+            String cssResource = loadStylesheet();
+            if (cssResource != null) {
+                scene.getStylesheets().add(cssResource);
             }
             stage.setScene(scene);
             
@@ -158,5 +158,31 @@ public class UINavigator {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private String loadStylesheet() {
+        // Intentar cargar style.css primero (tema por defecto)
+        try {
+            var cssUrl = getClass().getResource("/css/style.css");
+            if (cssUrl != null) {
+                return cssUrl.toExternalForm();
+            }
+        } catch (Exception e) {
+            log.debug("No se encontró style.css: {}", e.getMessage());
+        }
+
+        // Si no existe standard, cargar style-emerald.css (tema esmeralda)
+        try {
+            var emeraldCssUrl = getClass().getResource("/css/style-emerald.css");
+            if (emeraldCssUrl != null) {
+                return emeraldCssUrl.toExternalForm();
+            }
+        } catch (Exception e) {
+            log.debug("No se encontró style-emerald.css: {}", e.getMessage());
+        }
+
+        // Si no se encuentra ninguno, mostrar warning pero continuar
+        log.warn("No se encontró ningún archivo CSS. Continuando sin estilos.");
+        return null;
     }
 }

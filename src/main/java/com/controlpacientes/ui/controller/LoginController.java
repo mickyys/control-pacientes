@@ -108,7 +108,11 @@ public class LoginController {
             Parent root = loader.load();
             
             Scene scene = new Scene(root);
-            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+            // Cargar CSS dinámicamente - intenta emerald primero, luego style.css
+            String cssResource = loadStylesheet();
+            if (cssResource != null) {
+                scene.getStylesheets().add(cssResource);
+            }
             
             stage.setTitle("Control de Pacientes");
             stage.setScene(scene);
@@ -119,5 +123,31 @@ public class LoginController {
             log.error("Error al cargar pantalla principal", e);
             lblError.setText("Error al cargar la aplicación");
         }
+    }
+
+    private String loadStylesheet() {
+        // Intentar cargar style.css primero (tema por defecto)
+        try {
+            var cssUrl = getClass().getResource("/css/style.css");
+            if (cssUrl != null) {
+                return cssUrl.toExternalForm();
+            }
+        } catch (Exception e) {
+            log.debug("No se encontró style.css: {}", e.getMessage());
+        }
+
+        // Si no existe standard, cargar style-emerald.css (tema esmeralda)
+        try {
+            var emeraldCssUrl = getClass().getResource("/css/style-emerald.css");
+            if (emeraldCssUrl != null) {
+                return emeraldCssUrl.toExternalForm();
+            }
+        } catch (Exception e) {
+            log.debug("No se encontró style-emerald.css: {}", e.getMessage());
+        }
+
+        // Si no se encuentra ninguno, mostrar warning pero continuar
+        log.warn("No se encontró ningún archivo CSS. Continuando sin estilos.");
+        return null;
     }
 }
