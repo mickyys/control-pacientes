@@ -185,6 +185,53 @@
 			</dependencies>
 		</profile>
 
+		<!-- Emerald Theme Profile -->
+		<profile>
+			<id>emerald</id>
+			<build>
+				<resources>
+					<resource>
+						<directory>src/main/resources</directory>
+						<includes>
+							<include>**/*</include>
+						</includes>
+						<excludes>
+							<exclude>css/style.css</exclude>
+						</excludes>
+					</resource>
+					<resource>
+						<directory>src/main/resources/css</directory>
+						<targetPath>css</targetPath>
+						<includes>
+							<include>style-emerald.css</include>
+						</includes>
+						<filtering>false</filtering>
+					</resource>
+				</resources>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>3.1.0</version>
+						<executions>
+							<execution>
+								<id>rename-emerald-css</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<move file="${project.build.outputDirectory}/css/style-emerald.css" tofile="${project.build.outputDirectory}/css/style.css" failonerror="false"/>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
 		<!-- Production Profile -->
 		<profile>
 			<id>prod</id>
@@ -196,6 +243,7 @@
 					<plugin>
 						<groupId>org.springframework.boot</groupId>
 						<artifactId>spring-boot-maven-plugin</artifactId>
+						<version>3.1.7</version>
 						<configuration>
 							<mainClass>com.controlpacientes.ControlPacientesApplication</mainClass>
 							<finalName>control-pacientes</finalName>
@@ -211,32 +259,8 @@
 								<goals>
 									<goal>repackage</goal>
 								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-shade-plugin</artifactId>
-						<version>3.5.0</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<goals>
-									<goal>shade</goal>
-								</goals>
 								<configuration>
-									<minimizeJar>true</minimizeJar>
-									<filters>
-										<filter>
-											<artifact>*:*</artifact>
-											<excludes>
-												<exclude>META-INF/*.SF</exclude>
-												<exclude>META-INF/*.DSA</exclude>
-												<exclude>META-INF/*.RSA</exclude>
-												<exclude>META-INF/MANIFEST.MF</exclude>
-											</excludes>
-										</filter>
-									</filters>
+									<classifier>spring-boot</classifier>
 								</configuration>
 							</execution>
 						</executions>
