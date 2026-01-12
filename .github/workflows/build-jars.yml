@@ -13,6 +13,11 @@ jobs:
   build-windows-jar:
     runs-on: ubuntu-latest
     name: Build Windows JAR
+    strategy:
+      matrix:
+        variant: 
+          - {name: "standard", profile: "windows,prod", suffix: ""}
+          - {name: "emerald", profile: "windows,emerald,prod", suffix: "-emerald"}
     
     steps:
       - name: Checkout code
@@ -25,25 +30,30 @@ jobs:
           distribution: 'temurin'
           cache: maven
       
-      - name: Build Windows JAR
-        run: mvn clean package -Pwindows,prod -DskipTests -Drevision=windows
+      - name: Build Windows JAR (${{ matrix.variant.name }})
+        run: mvn clean package -P${{ matrix.variant.profile }} -DskipTests
       
       - name: Rename JAR for Windows
         run: |
           if [ -f "target/control-pacientes.jar" ]; then
-            mv target/control-pacientes.jar target/control-pacientes-windows.jar
+            mv target/control-pacientes.jar target/control-pacientes-windows${{ matrix.variant.suffix }}.jar
           fi
       
       - name: Upload Windows JAR Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: control-pacientes-windows-jar
-          path: target/control-pacientes-windows.jar
+          name: control-pacientes-windows-jar-${{ matrix.variant.name }}
+          path: target/control-pacientes-windows${{ matrix.variant.suffix }}.jar
           retention-days: 30
 
   build-linux-jar:
     runs-on: ubuntu-latest
     name: Build Linux JAR
+    strategy:
+      matrix:
+        variant: 
+          - {name: "standard", profile: "linux,prod", suffix: ""}
+          - {name: "emerald", profile: "linux,emerald,prod", suffix: "-emerald"}
     
     steps:
       - name: Checkout code
@@ -56,25 +66,30 @@ jobs:
           distribution: 'temurin'
           cache: maven
       
-      - name: Build Linux JAR
-        run: mvn clean package -Plinux,prod -DskipTests -Drevision=linux
+      - name: Build Linux JAR (${{ matrix.variant.name }})
+        run: mvn clean package -P${{ matrix.variant.profile }} -DskipTests
       
       - name: Rename JAR for Linux
         run: |
           if [ -f "target/control-pacientes.jar" ]; then
-            mv target/control-pacientes.jar target/control-pacientes-linux.jar
+            mv target/control-pacientes.jar target/control-pacientes-linux${{ matrix.variant.suffix }}.jar
           fi
       
       - name: Upload Linux JAR Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: control-pacientes-linux-jar
-          path: target/control-pacientes-linux.jar
+          name: control-pacientes-linux-jar-${{ matrix.variant.name }}
+          path: target/control-pacientes-linux${{ matrix.variant.suffix }}.jar
           retention-days: 30
 
   build-macos-jar:
     runs-on: macos-latest
     name: Build macOS JAR
+    strategy:
+      matrix:
+        variant: 
+          - {name: "standard", profile: "macos,prod", suffix: ""}
+          - {name: "emerald", profile: "macos,emerald,prod", suffix: "-emerald"}
     
     steps:
       - name: Checkout code
@@ -87,20 +102,20 @@ jobs:
           distribution: 'temurin'
           cache: maven
       
-      - name: Build macOS JAR
-        run: mvn clean package -Pmacos,prod -DskipTests -Drevision=macos
+      - name: Build macOS JAR (${{ matrix.variant.name }})
+        run: mvn clean package -P${{ matrix.variant.profile }} -DskipTests
       
       - name: Rename JAR for macOS
         run: |
           if [ -f "target/control-pacientes.jar" ]; then
-            mv target/control-pacientes.jar target/control-pacientes-macos.jar
+            mv target/control-pacientes.jar target/control-pacientes-macos${{ matrix.variant.suffix }}.jar
           fi
       
       - name: Upload macOS JAR Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: control-pacientes-macos-jar
-          path: target/control-pacientes-macos.jar
+          name: control-pacientes-macos-jar-${{ matrix.variant.name }}
+          path: target/control-pacientes-macos${{ matrix.variant.suffix }}.jar
           retention-days: 30
 
   create-release:
@@ -120,9 +135,12 @@ jobs:
       - name: Prepare release files
         run: |
           mkdir -p release
-          cp artifacts/control-pacientes-windows-jar/*.jar release/ || true
-          cp artifacts/control-pacientes-linux-jar/*.jar release/ || true
-          cp artifacts/control-pacientes-macos-jar/*.jar release/ || true
+          cp artifacts/control-pacientes-windows-jar-standard/*.jar release/ 2>/dev/null || true
+          cp artifacts/control-pacientes-windows-jar-emerald/*.jar release/ 2>/dev/null || true
+          cp artifacts/control-pacientes-linux-jar-standard/*.jar release/ 2>/dev/null || true
+          cp artifacts/control-pacientes-linux-jar-emerald/*.jar release/ 2>/dev/null || true
+          cp artifacts/control-pacientes-macos-jar-standard/*.jar release/ 2>/dev/null || true
+          cp artifacts/control-pacientes-macos-jar-emerald/*.jar release/ 2>/dev/null || true
           ls -lh release/
       
       - name: Create Release with JARs
@@ -130,8 +148,11 @@ jobs:
         with:
           files: |
             release/control-pacientes-windows.jar
+            release/control-pacientes-windows-emerald.jar
             release/control-pacientes-linux.jar
+            release/control-pacientes-linux-emerald.jar
             release/control-pacientes-macos.jar
+            release/control-pacientes-macos-emerald.jar
           draft: false
           prerelease: false
           body: |
@@ -141,37 +162,76 @@ jobs:
             
             ### Available JARs
             
-            #### Windows JAR
+            #### Windows JAR (Standard Theme)
             **`control-pacientes-windows.jar`**
             - Optimized for Windows 10+
             - Includes Windows-specific JavaFX libraries
+            - Standard color theme
             - Minimized dependencies
             
-            ##### Run on Windows
+            ##### Run on Windows (Standard)
             ```cmd
             java -server -XX:+UseG1GC -Xms1g -Xmx2g -jar control-pacientes-windows.jar
+            ```
+            
+            #### Windows JAR (Emerald Theme) 🌿
+            **`control-pacientes-windows-emerald.jar`**
+            - Optimized for Windows 10+
+            - Includes Windows-specific JavaFX libraries
+            - Emerald green color theme (healing & fresh)
+            - Minimized dependencies
+            
+            ##### Run on Windows (Emerald)
+            ```cmd
+            java -server -XX:+UseG1GC -Xms1g -Xmx2g -jar control-pacientes-windows-emerald.jar
             ```
             
             #### Linux JAR
             **`control-pacientes-linux.jar`**
             - Optimized for Linux
             - Includes Linux-specific JavaFX libraries
+            - Standard color theme
             - Minimized dependencies
             
-            ##### Run on Linux
+            ##### Run on Linux (Standard)
             ```bash
             java -server -XX:+UseG1GC -Xms1g -Xmx2g -jar control-pacientes-linux.jar
+            ```
+            
+            #### Linux JAR (Emerald Theme) 🌿
+            **`control-pacientes-linux-emerald.jar`**
+            - Optimized for Linux
+            - Includes Linux-specific JavaFX libraries
+            - Emerald green color theme (healing & fresh)
+            - Minimized dependencies
+            
+            ##### Run on Linux (Emerald)
+            ```bash
+            java -server -XX:+UseG1GC -Xms1g -Xmx2g -jar control-pacientes-linux-emerald.jar
             ```
             
             #### macOS JAR
             **`control-pacientes-macos.jar`**
             - Optimized for macOS 10.14+
             - Includes macOS-specific JavaFX libraries
+            - Standard color theme
             - Minimized dependencies
             
-            ##### Run on macOS
+            ##### Run on macOS (Standard)
             ```bash
             java -server -XX:+UseG1GC -Xms1g -Xmx2g -jar control-pacientes-macos.jar
+            ```
+            
+            #### macOS JAR (Emerald Theme) 🌿
+            **`control-pacientes-macos-emerald.jar`**
+            - Optimized for macOS 10.14+
+            - Includes macOS-specific JavaFX libraries
+            - Emerald green color theme (healing & fresh)
+            - Minimized dependencies
+            
+            ##### Run on macOS (Emerald)
+            ```bash
+            java -server -XX:+UseG1GC -Xms1g -Xmx2g -jar control-pacientes-macos-emerald.jar
             ```
             
             ### System Requirements
