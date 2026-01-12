@@ -232,6 +232,53 @@
 			</build>
 		</profile>
 
+		<!-- Dark Theme Profile -->
+		<profile>
+			<id>dark</id>
+			<build>
+				<resources>
+					<resource>
+						<directory>src/main/resources</directory>
+						<includes>
+							<include>**/*</include>
+						</includes>
+						<excludes>
+							<exclude>css/style.css</exclude>
+						</excludes>
+					</resource>
+					<resource>
+						<directory>src/main/resources/css</directory>
+						<targetPath>css</targetPath>
+						<includes>
+							<include>style-dark.css</include>
+						</includes>
+						<filtering>false</filtering>
+					</resource>
+				</resources>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>3.1.0</version>
+						<executions>
+							<execution>
+								<id>rename-dark-css</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<move file="${project.build.outputDirectory}/css/style-dark.css" tofile="${project.build.outputDirectory}/css/style.css" failonerror="false"/>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
 		<!-- Production Profile -->
 		<profile>
 			<id>prod</id>

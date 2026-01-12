@@ -18,6 +18,7 @@ jobs:
         variant: 
           - {name: "standard", profile: "windows,prod", suffix: ""}
           - {name: "emerald", profile: "windows,emerald,prod", suffix: "-emerald"}
+          - {name: "dark", profile: "windows,dark,prod", suffix: "-dark"}
     
     steps:
       - name: Checkout code
@@ -54,6 +55,7 @@ jobs:
         variant: 
           - {name: "standard", profile: "linux,prod", suffix: ""}
           - {name: "emerald", profile: "linux,emerald,prod", suffix: "-emerald"}
+          - {name: "dark", profile: "linux,dark,prod", suffix: "-dark"}
     
     steps:
       - name: Checkout code
@@ -90,6 +92,7 @@ jobs:
         variant: 
           - {name: "standard", profile: "macos,prod", suffix: ""}
           - {name: "emerald", profile: "macos,emerald,prod", suffix: "-emerald"}
+          - {name: "dark", profile: "macos,dark,prod", suffix: "-dark"}
     
     steps:
       - name: Checkout code
@@ -137,10 +140,13 @@ jobs:
           mkdir -p release
           cp artifacts/control-pacientes-windows-jar-standard/*.jar release/ 2>/dev/null || true
           cp artifacts/control-pacientes-windows-jar-emerald/*.jar release/ 2>/dev/null || true
+          cp artifacts/control-pacientes-windows-jar-dark/*.jar release/ 2>/dev/null || true
           cp artifacts/control-pacientes-linux-jar-standard/*.jar release/ 2>/dev/null || true
           cp artifacts/control-pacientes-linux-jar-emerald/*.jar release/ 2>/dev/null || true
+          cp artifacts/control-pacientes-linux-jar-dark/*.jar release/ 2>/dev/null || true
           cp artifacts/control-pacientes-macos-jar-standard/*.jar release/ 2>/dev/null || true
           cp artifacts/control-pacientes-macos-jar-emerald/*.jar release/ 2>/dev/null || true
+          cp artifacts/control-pacientes-macos-jar-dark/*.jar release/ 2>/dev/null || true
           ls -lh release/
       
       - name: Create Release with JARs
@@ -149,10 +155,13 @@ jobs:
           files: |
             release/control-pacientes-windows.jar
             release/control-pacientes-windows-emerald.jar
+            release/control-pacientes-windows-dark.jar
             release/control-pacientes-linux.jar
             release/control-pacientes-linux-emerald.jar
+            release/control-pacientes-linux-dark.jar
             release/control-pacientes-macos.jar
             release/control-pacientes-macos-emerald.jar
+            release/control-pacientes-macos-dark.jar
           draft: false
           prerelease: false
           body: |
@@ -232,6 +241,42 @@ jobs:
             ##### Run on macOS (Emerald)
             ```bash
             java -server -XX:+UseG1GC -Xms1g -Xmx2g -jar control-pacientes-macos-emerald.jar
+            ```
+            
+            #### Windows JAR (Dark Theme) 🌙
+            **`control-pacientes-windows-dark.jar`**
+            - Optimized for Windows 10+
+            - Includes Windows-specific JavaFX libraries
+            - Dark theme with blue accents (accessibility & reduced eye strain)
+            - Minimized dependencies
+            
+            ##### Run on Windows (Dark)
+            ```cmd
+            java -server -XX:+UseG1GC -Xms1g -Xmx2g -jar control-pacientes-windows-dark.jar
+            ```
+            
+            #### Linux JAR (Dark Theme) 🌙
+            **`control-pacientes-linux-dark.jar`**
+            - Optimized for Linux
+            - Includes Linux-specific JavaFX libraries
+            - Dark theme with blue accents (accessibility & reduced eye strain)
+            - Minimized dependencies
+            
+            ##### Run on Linux (Dark)
+            ```bash
+            java -server -XX:+UseG1GC -Xms1g -Xmx2g -jar control-pacientes-linux-dark.jar
+            ```
+            
+            #### macOS JAR (Dark Theme) 🌙
+            **`control-pacientes-macos-dark.jar`**
+            - Optimized for macOS 10.14+
+            - Includes macOS-specific JavaFX libraries
+            - Dark theme with blue accents (accessibility & reduced eye strain)
+            - Minimized dependencies
+            
+            ##### Run on macOS (Dark)
+            ```bash
+            java -server -XX:+UseG1GC -Xms1g -Xmx2g -jar control-pacientes-macos-dark.jar
             ```
             
             ### System Requirements
